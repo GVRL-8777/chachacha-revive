@@ -25,6 +25,7 @@ OUT = os.path.join(HERE, 'docs', 'FILES.md')
 # 하는 일끼리 묶는다. research/ 는 정의상 잡동사니이므로 이름순으로 둔다.
 GROUPS = {
     'tools': [
+        ('이 폴더', 'README.md'),
         ('런처', """chatool.py chatool_page.py chatool_page_assets.py chatool_assets.py
             chabuild.py chasaves.py chahost.py chastate.py chaproj.py chalog.py
             chalang.py langkeys.py langcheck.py chapaths.py chapick.py
@@ -50,6 +51,7 @@ GROUPS = {
             scansplit.py ildis.py ildump.py ilscan.py typemap.py mkreport.py"""),
     ],
     'patch': [
+        ('이 폴더', 'README.md'),
         ('APK 에 들어가는 코드', 'ChaLocal.cs ChaLocalData.cs'),
         ('게임 DLL 패처', """localfix.cs patchcn.cs patch8.cs dbhook.cs tunnelfix.cs
             shopfix.cs titlefix.cs tradefix.cs rankfix.cs invitefix.cs modesfix.cs
@@ -62,6 +64,7 @@ GROUPS = {
         ('라이브러리', 'Mono.Cecil.dll'),
     ],
     'scripts': [
+        ('이 폴더', 'README.md'),
         ('빌드', 'builddll.sh'),
         ('폰에서 돌려 보기', 'run.sh play.sh runlocal.sh relaunch.sh relaunch2.sh'),
         ('사진 찍기', """shot.sh race.sh racecheck.sh drv.sh drvshot.sh themesweep.sh
