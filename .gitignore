@@ -1,0 +1,71 @@
+# 이 저장소는 **막고 시작합니다.**
+#
+# 작업 폴더에는 원본 게임을 푼 트리, 뽑아 놓은 자산, 스크린샷 수천 장,
+# 세이브, 서명 열쇠가 뒤섞여 있습니다. 하나씩 막는 방식으로는 언젠가
+# 하나가 새어 나갑니다. 그래서 **전부 막고, 올릴 것만 엽니다.**
+#
+# gitignore 는 줄 끝 주석을 모릅니다. 주석은 반드시 제 줄에 씁니다.
+
+# ── 전부 막는다 ───────────────────────────────────────────────────────
+/*
+/*/
+
+# ── 올릴 것만 연다 ────────────────────────────────────────────────────
+!/.gitignore
+!/README.md
+!/LICENSE
+
+# 도구 · 서버 · 런처 · 패처 소스
+!/*.py
+!/*.cs
+!/*.sh
+
+# 연구 기록
+!/docs/
+/docs/*
+!/docs/*.md
+
+# 런처의 말
+!/lang/
+/lang/*
+!/lang/*.json
+
+# 패처가 쓰는 라이브러리 (게임에서 나온 것이 아님)
+!/Mono.Cecil.dll
+
+# 번들에 담을 목록 — 자산이 아니라 이름표만 적힌 텍스트 파일
+!/packspec.txt
+
+# ── 위에서 열렸지만 올리면 안 되는 것 ────────────────────────────────
+# 세션 부산물. AI 작업 중 임시 폴더를 가리키는 스크립트들이라
+# 사용자 폴더 이름이 그대로 박혀 있고, 연구물도 아닙니다.
+/mem*.py
+/audit_fixes.py
+/callers.py
+/crosscheck.py
+/enums.py
+/fldmap.py
+/fldrefs.py
+/listm.py
+/patchil.py
+/recover.py
+/recover2.py
+/replay_fixes.py
+/resload.py
+/revcheck.py
+/schema.py
+/vercheck.py
+
+# 창 런처(Flet). 저장소에서는 브라우저 런처 한 벌만 씁니다.
+/chaflet*.py
+
+# 개인적인 것
+/chastate.json
+/chalog.jsonl
+/.uiconf.json
+/.buildconf.json
+
+# 서명 열쇠
+/*.keystore
+/*.jks
+/*.p12
