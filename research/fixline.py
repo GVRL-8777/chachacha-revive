@@ -1,3 +1,4 @@
+# 한 번 쓰고 만 수선 스크립트 — 문자열표 항목 사이 빈 줄을 맞췄다.
 import io
 p='mkkorean.py'
 lines=io.open(p,encoding='utf-8').read().split('\n')

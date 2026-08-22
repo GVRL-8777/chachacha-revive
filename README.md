@@ -182,6 +182,9 @@ lang/        런처의 말 (en · kr)
 명령은 **저장소 뿌리에서** 실행합니다. `tools/` 안으로 들어가지 마세요.
 도구들은 뿌리를 작업 폴더로 보고 `x77/` · `saves/` · `lang/` 을 찾습니다.
 
+파일 하나하나가 무슨 일을 하는지는 [`docs/FILES.md`](docs/FILES.md) 에
+264개 전부 한 줄씩 적어 두었습니다.
+
 ```
 python tools/chatool.py
 ```

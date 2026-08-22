@@ -1,3 +1,4 @@
+// 지목한 타입들의 메서드·필드 개수와 목록을 요약한다.
 using System; using System.Linq; using Mono.Cecil;
 class T {
   static void Main(string[] a) {

@@ -1,3 +1,4 @@
+// 타입의 필드를 메타데이터 토큰·타입·static 여부까지 찍는다.
 using System; using System.Linq; using Mono.Cecil;
 static class FI {
   static int Main(string[] a){

@@ -1,3 +1,4 @@
+// 한 타입(중첩 포함)의 모든 메서드 IL 과 필드를 통째로 찍는다.
 using System; using System.Collections.Generic; using System.Linq;
 using Mono.Cecil; using Mono.Cecil.Cil;
 class T { static void Main(string[] a){

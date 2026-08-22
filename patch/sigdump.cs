@@ -1,3 +1,4 @@
+// 메서드 하나의 인자·반환 타입(시그니처)을 찍는다.
 using System; using System.Linq; using Mono.Cecil;
 static class S { static int Main(string[] a) {
   var r = new DefaultAssemblyResolver(); r.AddSearchDirectory(a[1]);

@@ -1,3 +1,4 @@
+// 타입의 public 메서드 목록을 인자 타입까지 붙여 찍는다.
 using System; using System.Linq; using Mono.Cecil;
 class L { static void Main(string[] a){
   var m = ModuleDefinition.ReadModule(a[0]);

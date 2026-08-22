@@ -1,3 +1,4 @@
+# 한 번 쓰고 만 수선 스크립트 — 문자열표를 CRLF 로 끝나게 고쳤다.
 import io
 p='mkkorean.py'
 lines=io.open(p,encoding='utf-8').read().split('\n')

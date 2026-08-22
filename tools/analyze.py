@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# 배포판끼리 같은 이름 자산의 해시를 견줘 무엇이 다른지 본다.
 import os, re, hashlib, sys
 import sfx
 

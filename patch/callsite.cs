@@ -1,3 +1,4 @@
+// 지목한 메서드가 어디서 몇 번 불리는지 센다.
 using System; using System.Collections.Generic; using System.Linq;
 using Mono.Cecil; using Mono.Cecil.Cil;
 class S { static void Main(string[] a){

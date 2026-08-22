@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# tools/mkbundle.py 와 같은 내용의 복구본.
 """유니티 4 용 UnityRaw(무압축) 에셋번들을 만든다.
 
 목적: 색인(mainData)을 건드리지 않고 **자산을 추가**하기 위해서다.

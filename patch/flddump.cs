@@ -1,3 +1,4 @@
+// 타입의 필드 이름과 타입을 두 칸으로 찍는다.
 using System; using System.Linq; using Mono.Cecil;
 static class F { static int Main(string[] a) {
   var r = new DefaultAssemblyResolver(); r.AddSearchDirectory(a[1]);

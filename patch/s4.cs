@@ -1,3 +1,4 @@
+// 어떤 메서드를 부르는 자리를 찾아 그 앞뒤 IL 까지 같이 보여 준다.
 using System; using System.Collections.Generic; using System.Linq;
 using Mono.Cecil; using Mono.Cecil.Cil;
 class S4 { static void Main(string[] a){

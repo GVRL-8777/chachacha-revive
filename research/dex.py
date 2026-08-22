@@ -1,3 +1,4 @@
+# DEX 파일 머리와 문자열 표를 직접 읽는다.
 import sys, struct
 
 def uleb(b, o):

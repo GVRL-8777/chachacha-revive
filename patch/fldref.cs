@@ -1,3 +1,4 @@
+// 지목한 필드를 읽거나 쓰는 자리를 전부 찾는다.
 using System; using System.Linq; using Mono.Cecil; using Mono.Cecil.Cil;
 class P {
   static void Main(string[] a) {

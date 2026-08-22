@@ -1,3 +1,4 @@
+// 이름이 특정 접두사로 시작하는 타입들의 IL 을 찍는다(기본 __Cha).
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,3 +1,4 @@
+// 이름에 특정 낱말이 든 **열거형**을 찾는다(중첩까지).
 using System; using System.Linq; using Mono.Cecil;
 class T2 { static void Main(string[] a){
   var m = ModuleDefinition.ReadModule(a[0]);

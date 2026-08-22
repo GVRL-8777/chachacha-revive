@@ -1,3 +1,4 @@
+// 어떤 메서드를 부르는 메서드의 이름만 나열한다.
 using System; using System.Collections.Generic; using System.Linq;
 using Mono.Cecil; using Mono.Cecil.Cil;
 class S3 { static void Main(string[] a){

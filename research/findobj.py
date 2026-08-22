@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# 폴더 안 자산을 전부 훑어 이름에 걸리는 오브젝트를 찾는다.
 import sys, os, UnityPy, collections
 folder=sys.argv[1]; pats=[s.lower() for s in sys.argv[2:]]
 hits=collections.defaultdict(list)

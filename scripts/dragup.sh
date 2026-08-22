@@ -1,4 +1,5 @@
 #!/bin/sh
+# 화면을 손가락으로 끌어올린다(목록 스크롤). 사용법: sh dragup.sh <반복횟수>
 N="${1:-1}"; i=0
 while [ $i -lt $N ]; do
   adb shell input motionevent DOWN 620 220 >/dev/null

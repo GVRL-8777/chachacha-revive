@@ -1,3 +1,4 @@
+# APK 서명(MANIFEST.MF · CERT.SF)의 해시가 맞는지 검산한다.
 import zipfile, hashlib, base64, re, sys, struct
 
 apk = r"D:\Vibes\ChaChaCha\CCC_fK_v7.7.0.apk"

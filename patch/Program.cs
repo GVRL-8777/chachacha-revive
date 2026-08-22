@@ -1,3 +1,4 @@
+// C# 커뮤니티 서버의 진입점. HTTP 리스너를 열고 요청을 넘긴다.
 using chachacha_server.HTTP;
 using System.Text;
 

@@ -1,3 +1,4 @@
+# AXML(이진 AndroidManifest.xml)을 사람이 읽을 수 있게 푼다.
 import sys, struct
 
 def u32(b,o): return struct.unpack_from('<I',b,o)[0]

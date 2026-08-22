@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# 맵 루트가 실제로 물고 있는 sharedassets 조각을 따라간다.
 import io, os
 from collections import defaultdict
 from UnityPy.streams import EndianBinaryReader

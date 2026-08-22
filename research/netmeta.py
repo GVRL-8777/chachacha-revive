@@ -1,3 +1,4 @@
+# .NET PE 파일의 메타데이터 스트림을 직접 파싱한다.
 import sys, struct
 
 def compressed_uint(b, o):

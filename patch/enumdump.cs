@@ -1,3 +1,4 @@
+// 어셈블리 안의 열거형과 그 값을 전부 찍는다.
 using System; using System.Linq; using Mono.Cecil;
 class E {
   static void Main(string[] a) {

@@ -1,3 +1,4 @@
+# 이진 파일에서 아스키 문자열을 뽑는다(중복 제거).
 import sys, re
 b=open(sys.argv[1],'rb').read()
 n=int(sys.argv[2]) if len(sys.argv)>2 else 6
