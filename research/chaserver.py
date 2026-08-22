@@ -211,7 +211,7 @@ def ep_server_control(req):
     }
 
 
-> # 플레이어 초기 상태. 서버가 권위를 가지는 값이라 여기서 정한다.
+# 플레이어 초기 상태. 서버가 권위를 가지는 값이라 여기서 정한다.
 PLAYER = {
     "nickName": "Racer",
     "gold": 50000,

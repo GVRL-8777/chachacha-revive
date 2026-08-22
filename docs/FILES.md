@@ -1,7 +1,7 @@
 # 파일 하나하나가 하는 일
 
-저장소에 든 264개 파일의 한 줄 요약입니다. 각 파일 첫머리에도 같은 설명이
-주석으로 붙어 있습니다.
+저장소에 든 267개 파일의 한 줄 요약입니다. 같은 설명이 각 파일 첫머리에도
+주석으로 붙어 있고, 이 문서는 거기서 긁어 만듭니다 (`python tools/mkfiles.py`).
 
 ---
 
@@ -29,6 +29,7 @@
 | `chapaths.py` | 원본 APK 가 어디 있는지 **스스로 찾습니다.** 예전에는 스크립트마다 `D:/어딘가/CCC_fK_v7.7.0.apk` 처럼 만든 사람의 경로가 박혀 있었습니다. |
 | `chapick.py` | 파일·폴더 고르는 창을 띄웁니다. |
 | `chalauncher.py` | 차차차 상태 파일을 브라우저에서 고친다. |
+| `mkfiles.py` | `docs/FILES.md` — 저장소 파일 하나하나의 한 줄 설명 — 를 다시 만든다. |
 
 ### 사설 서버
 
@@ -213,7 +214,7 @@ C# 소스. Cecil 패처와, APK 안에 들어가는 코드입니다.
 | 파일 | 하는 일 |
 |---|---|
 | `Program.cs` | C# 커뮤니티 서버의 진입점. |
-| `SchemaCollector.cs` | 아직 안 만든 엔드포인트로 들어온 요청을 모아 JSON 스키마를 추론한다. |
+| `SchemaCollector.cs` | <summary> 미구현 엔드포인트로 들어오는 요청을 수집하고, 관측된 JSON에서 요청 스키마를 추론한다. |
 
 ### 라이브러리
 
@@ -274,6 +275,7 @@ C# 소스. Cecil 패처와, APK 안에 들어가는 코드입니다.
 
 | 파일 | 하는 일 |
 |---|---|
+| `_here.py` | 조사용 스크립트가 원본 APK 와 작업 폴더를 **스스로 찾게** 해 준다. |
 | `addbundle.py` | 1단계 배선: 번들을 내려받아 AssetBundle.Load 가 실제로 동작하는지 실기에서 확인한다. |
 | `addnetq.py` | chacnserver.py 에 NetQuery 패킷 자동 응답을 붙인다. |
 | `addportraits.py` | 드라이버 9~12번 초상화를 중국판 UI 아틀라스에 추가한다. |
@@ -289,7 +291,7 @@ C# 소스. Cecil 패처와, APK 안에 들어가는 코드입니다.
 | `catdump.py` | 공여판 mainData 의 ResourceManager 카탈로그에서 맵 항목을 나열한다. |
 | `catserver.py` | AssetCatalogue 를 내려주는 부트스트랩 서버 + 전 요청 로깅. |
 | `cha8server.py` | 다함께 차차차 v1.3.1 (8.apk) 전용 사설 서버. |
-| `chaserver.py` | 파이썬 단독 사설 서버의 첫 판. |
+| `chaserver.py` | 다함께 차차차 사설 게임 서버 (파이썬 단독). |
 | `clipcensus.py` | 배포판별 AudioClip 전수 조사. |
 | `cnpatch.py` | makecnserver.py 가 만든 chacnserver.py 에 뒤에 붙였던 것들을 다시 얹는다. |
 | `deadidx.py` | 중국판 색인에서 '실제로 쓰이지 않는/비어 있는' 항목을 찾는다. |
@@ -346,7 +348,7 @@ C# 소스. Cecil 패처와, APK 안에 들어가는 코드입니다.
 | `segfull.py` | 세그먼트의 트랜스폼 계층과 메시 바운드를 월드 기준으로 환산해 비교한다. |
 | `sf2.py` | SerializedFile(포맷 9) 메타데이터를 정확히 파싱한다. |
 | `sfhdr.py` | 유니티 SerializedFile(mainData)의 헤더/테이블 구조를 직접 파싱한다. |
-| `sfmerge_replay.py` | 잃어버린 sfmerge.py 를 되살리던 중간본. |
+| `sfmerge_replay.py` | 여러 직렬화 파일을 **하나의** 번들용 직렬화 파일로 합친다. |
 | `splitassets.py` | 자산 파일을 유니티 안드로이드 빌드의 split 조각으로 쪼개 overlay 에 넣는다. |
 | `strings.py` | 이진 파일에서 아스키 문자열을 뽑는다(중복 제거). |
 | `survey.py` | APK 들을 훑어 버전/유니티/리소스 목록을 뽑는다. |
@@ -374,8 +376,8 @@ C# 소스. Cecil 패처와, APK 안에 들어가는 코드입니다.
 | 문서 | 무엇을 적었나 |
 |---|---|
 | [`CAPTURE.md`](CAPTURE.md) | 요청 스키마 수집기 (Schema Collector) |
-| [`FILES.md`](FILES.md) | 이 문서. 파일 하나하나가 하는 일. |
 | [`DORMANT.md`](DORMANT.md) | 묻어 둔 기능들 |
+| [`FILES.md`](FILES.md) | 이 문서. 파일 하나하나가 하는 일. |
 | [`LOCALAPK.md`](LOCALAPK.md) | 서버 없는 로컬 전용 APK — 완성 (2026-08-21) |
 | [`NEWCAR.md`](NEWCAR.md) | 새 차 추가 — 덮어쓰지 않고 한 대를 늘립니다 |
 | [`PRESETS.md`](PRESETS.md) | 판 가르기 — 이제 **세이브 파일**입니다 |

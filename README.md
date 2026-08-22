@@ -274,6 +274,8 @@ apk 를 찾는 자리:
   /home/me/chachacha-revive
   /home/me
 
+  글자 폭을 잴 한글 폰트: /usr/share/fonts/truetype/nanum/NanumGothicBold.ttf
+
   cn     중국판 com.cjenm.chachachacn 1.2.1        5577.com.cjenm.chachachacn.apk
   gogo   GoGoGo Racer 1.4.3 (맵 이식원)             gogogoracer-1-4-3.apk
   kr     한국판 com.cjenm.chachacha 7.7.0          — 없음
@@ -286,6 +288,14 @@ export CHA_APK_DIR=/어디에/두었는지        # 윈도우는 set CHA_APK_DIR
 ```
 
 못 찾으면 **무엇을 어디에 두면 되는지 알려 주고 멈춥니다.**
+
+한글화 도구는 문구가 화면에서 몇 픽셀을 먹는지 재느라 **한글 트루타입**도
+하나 씁니다. 윈도우의 맑은 고딕, 리눅스의 나눔고딕, macOS 의 애플 고딕을
+차례로 찾아보고, 없으면 `CHA_FONT` 로 알려 주시면 됩니다.
+
+```bash
+export CHA_FONT=/어디에/NanumGothicBold.ttf
+```
 
 ### 1. 한국어 문자열표 뽑기
 

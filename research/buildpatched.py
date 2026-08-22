@@ -11,9 +11,10 @@
 사용법: python buildpatched.py <base_url> <out.apk>
    예:  python buildpatched.py http://192.168.0.10:8888/ out.apk
 """
+from _here import apk
 import zipfile, struct, sys, os
 
-SRC = r"D:\Vibes\ChaChaCha\CCC_fK_v7.7.0.apk"
+SRC = apk('kr')
 ASSET = "assets/bin/Data/46d4d4a5ba7c79e469ef05e22157e120"
 ORIG = b"http://cr.img.mcdn.netmarble.kr/cr/Real/Android/"   # 48 bytes
 SWAP = {

@@ -1,7 +1,8 @@
 """APK 전체 엔트리를 훑어 CDN/서버 호스트 문자열이 어디에 박혀 있는지 찾는다."""
+from _here import apk
 import zipfile, re, sys
 
-APK = r"D:\Vibes\ChaChaCha\CCC_fK_v7.7.0.apk"
+APK = apk('kr')
 PAT = re.compile(rb'[\x20-\x7e]{4,200}?(mcdn|netmarble\.kr|\.mcdn\.|cr/Real|AssetCatalogue|img\.netmarble)[\x20-\x7e]{0,200}', re.I)
 
 z = zipfile.ZipFile(APK)

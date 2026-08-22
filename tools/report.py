@@ -5,10 +5,11 @@ import json
 import re
 
 from scanwidth import Meter, load, NLTOK
+import chapaths
 
 cn, _ = load('st_cn.txt')
 kr, _ = load('st_merged_kr.txt')
-m = Meter('C:/Windows/Fonts/malgunbd.ttf')
+m = Meter(chapaths.font())
 rows = json.load(io.open('labels.json', encoding='utf-8'))
 
 risk = []

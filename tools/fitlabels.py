@@ -25,6 +25,7 @@ from sfwrite import ALIGN
 from UnityPy.streams import EndianBinaryReader
 from UnityPy.files.SerializedFile import SerializedFile
 from scanwidth import Meter, load
+import chapaths
 
 CN = 'survey/5577.com.cjenm.chachachacn/assets/bin/Data'
 OVERLAY = 'overlay'
@@ -255,7 +256,7 @@ def main():
     names = script_names()
     cn, _ = load('st_cn.txt')
     kr, _ = load('st_merged_kr.txt')
-    meter = Meter('C:/Windows/Fonts/malgunbd.ttf')
+    meter = Meter(chapaths.font())
     report = {'fixed': [], 'nobox': []}
     files = [p for p in glob.glob(os.path.join(CN, '*'))
              if not os.path.isdir(p) and not p.endswith('.resS') and '.split' not in p]

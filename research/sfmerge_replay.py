@@ -21,7 +21,7 @@ from sfparse import parse
 from sfwrite import make_manifest, ALIGN
 
 
-
+def walk_pptr(node, fn):
     """타입트리 dict 를 훑어 모든 PPtr 에 fn(dict) 을 적용한다."""
     n = 0
     if isinstance(node, dict):

@@ -2,9 +2,10 @@
 게임 컨텐츠 데이터(차량 스탯/아이템/미션)가 APK 안에 있는지 확인한다.
 있으면 로컬만으로 복원 가능, 없으면 죽은 CDN 에셋 번들이 필요하다.
 """
+from _here import apk
 import zipfile, re, collections
 
-APK = r"D:\Vibes\ChaChaCha\CCC_fK_v7.7.0.apk"
+APK = apk('kr')
 z = zipfile.ZipFile(APK)
 
 # 게스트 기본차 AVEO 를 비롯한 차량명/데이터 흔적

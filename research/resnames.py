@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """assets/bin/Data 의 해시 이름 파일에서 Unity 오브젝트 이름을 추출한다."""
+from _here import apk
 import zipfile, re, struct, collections, sys, io
-z = zipfile.ZipFile(r"D:\Vibes\ChaChaCha\CCC_fK_v7.7.0.apk")
+z = zipfile.ZipFile(apk('kr'))
 HASH = re.compile(r'^assets/bin/Data/[0-9a-f]{32}$')
 NAME = re.compile(rb'[A-Za-z0-9 _()\[\]\-\.#/&+]{3,60}$')
 

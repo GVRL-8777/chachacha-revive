@@ -110,6 +110,62 @@ def apk(key, need=True):
            '\n'.join('      %s' % d for d in dirs())))
 
 
+# ── 한글 폰트 ────────────────────────────────────────────────────────────
+#
+# 문자열이 화면에서 몇 픽셀을 먹는지 재려면 한글이 들어간 트루타입이 필요합니다.
+# 예전에는 `C:/Windows/Fonts/malgunbd.ttf` 가 박혀 있어 윈도우 밖에선 안 돌았습니다.
+
+FONT_NAMES = [
+    'malgunbd.ttf', 'malgun.ttf',           # 윈도우 (맑은 고딕)
+    'NanumGothicBold.ttf', 'NanumGothic.ttf',
+    'NotoSansKR-Bold.otf', 'NotoSansCJK-Bold.ttc', 'NotoSansCJKkr-Bold.otf',
+    'AppleSDGothicNeo.ttc', 'AppleGothic.ttf',   # macOS
+]
+
+FONT_DIRS = [
+    'C:/Windows/Fonts',
+    os.path.expanduser('~/AppData/Local/Microsoft/Windows/Fonts'),
+    '/usr/share/fonts', '/usr/local/share/fonts', os.path.expanduser('~/.fonts'),
+    '/Library/Fonts', '/System/Library/Fonts',
+    os.path.expanduser('~/Library/Fonts'),
+]
+
+
+def font(need=True):
+    """글자 폭을 잴 한글 트루타입을 찾는다.
+
+    `CHA_FONT` 에 파일 자리를 직접 적어 주면 그것을 씁니다.
+    """
+    env = os.environ.get('CHA_FONT')
+    if env and os.path.isfile(env):
+        return env
+    for d in FONT_DIRS:
+        if not os.path.isdir(d):
+            continue
+        for name in FONT_NAMES:
+            hit = os.path.join(d, name)
+            if os.path.isfile(hit):
+                return hit
+        # 리눅스는 배포판마다 폴더가 깊어서 한 번 훑는다
+        for root, _dirs, fs in os.walk(d):
+            low = {f.lower(): f for f in fs}
+            for name in FONT_NAMES:
+                if name.lower() in low:
+                    return os.path.join(root, low[name.lower()])
+    if not need:
+        return None
+    raise SystemExit(
+        '\n글자 폭을 잴 한글 폰트를 못 찾았습니다.\n'
+        '  찾아본 이름 : %s\n'
+        '  찾아본 자리 :\n%s\n'
+        '\n한글 트루타입(예: 나눔고딕)을 위 자리 중 아무 데나 두거나,\n'
+        '자리를 알려 주세요.\n'
+        '      set CHA_FONT=D:\\어디에\\NanumGothicBold.ttf   (윈도우)\n'
+        '      export CHA_FONT=/어디에/NanumGothicBold.ttf      (그 밖)\n'
+        % (' · '.join(FONT_NAMES),
+           '\n'.join('      %s' % d for d in FONT_DIRS)))
+
+
 def have(key):
     return apk(key, need=False) is not None
 
@@ -119,6 +175,9 @@ def report():
     print('APK 를 찾는 자리:')
     for d in dirs():
         print('  %s' % d)
+    print()
+    print()
+    print('  글자 폭을 잴 한글 폰트: %s' % (font(need=False) or '— 없음'))
     print()
     for k in sorted(KNOWN):
         label, _pats = KNOWN[k]

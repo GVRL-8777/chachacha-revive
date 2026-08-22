@@ -4,10 +4,11 @@
 유니티 4 의 AudioClip 은 내부 포맷이 여러 가지라(MP3/Ogg/WAV/FSB) 우선 UnityPy 의
 디코더를 쓰고, 실패하면 원본 바이트를 헤더로 판별해 그대로 저장한다.
 """
+from _here import ROOT
 import os, sys, io, UnityPy
 
 SRC = 'survey/racechachachaforkakao/assets/bin/Data'
-OUT = r'D:\Vibes\ChaChaCha'
+OUT = ROOT
 WANT = sys.argv[1].lower() if len(sys.argv) > 1 else 'helly_vox'
 LIMIT = int(sys.argv[2]) if len(sys.argv) > 2 else 3
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """뽑아낸 MP3 가 정상 프레임을 갖췄는지 확인하고 대략적인 길이를 계산한다."""
+from _here import ROOT
 import io, os, glob
 
 BR = {  # MPEG1 Layer3 비트레이트 표 (kbps)
@@ -7,7 +8,7 @@ BR = {  # MPEG1 Layer3 비트레이트 표 (kbps)
     8: 112, 9: 128, 10: 160, 11: 192, 12: 224, 13: 256, 14: 320}
 SR = {0: 44100, 1: 48000, 2: 32000}
 
-for path in sorted(glob.glob(r'D:\Vibes\ChaChaCha\*.mp3')):
+for path in sorted(glob.glob(os.path.join(ROOT, '*.mp3'))):
     b = io.open(path, 'rb').read()
     # 첫 동기 워드 찾기
     i = 0

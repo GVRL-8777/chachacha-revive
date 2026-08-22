@@ -9,9 +9,10 @@
 
 결과: 시스템 링커가 정품 .so 를 직접 로드 -> IFUNC 정상 처리
 """
+from _here import apk
 import zipfile, shutil, sys, os
 
-SRC = r"D:\Vibes\ChaChaCha\CCC_fK_v7.7.0.apk"
+SRC = apk('kr')
 OUT = sys.argv[1] if len(sys.argv) > 1 else "unpacked.apk"
 
 SWAP = {

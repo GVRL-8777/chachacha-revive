@@ -13,10 +13,11 @@ import re
 import sys
 
 from fontTools.ttLib import TTFont
+import chapaths
 
 CN_TABLE = 'st_cn.txt'
 KR_TABLE = 'st_merged_kr.txt'
-FONT = 'C:/Windows/Fonts/malgunbd.ttf'
+FONT = chapaths.font()
 CRLF, LF, CR = chr(13) + chr(10), chr(10), chr(13)
 NLTOK = chr(92) + 'n'          # 표 안의 리터럴 \n
 TAG = re.compile(r'\[[0-9A-Fa-f]{6}\]|\[-\]|\[b\]|\[/b\]|\[i\]|\[/i\]|\[u\]|\[/u\]|\[s\]|\[/s\]')

@@ -2,9 +2,10 @@
 """조사 결과를 훑어보기 좋은 HTML 문서로 만든다."""
 import io, json, html
 from scanwidth import Meter, load, NLTOK
+import chapaths
 
 cn,_ = load('st_cn.txt'); kr,_ = load('st_merged_kr.txt')
-m = Meter('C:/Windows/Fonts/malgunbd.ttf')
+m = Meter(chapaths.font())
 rows = json.load(io.open('labels.json', encoding='utf-8'))
 
 wide, tall, seen = [], [], set()

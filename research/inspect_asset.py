@@ -1,7 +1,8 @@
 """URL 이 박힌 Unity 에셋의 직렬화 구조를 확인한다 (문자열 = int32 길이 + 바이트 + 4바이트 정렬)."""
+from _here import apk
 import zipfile, struct, re
 
-APK = r"D:\Vibes\ChaChaCha\CCC_fK_v7.7.0.apk"
+APK = apk('kr')
 ENTRY = "assets/bin/Data/46d4d4a5ba7c79e469ef05e22157e120"
 
 data = zipfile.ZipFile(APK).read(ENTRY)

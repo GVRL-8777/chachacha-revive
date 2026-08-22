@@ -1,7 +1,8 @@
 # APK 서명(MANIFEST.MF · CERT.SF)의 해시가 맞는지 검산한다.
+from _here import apk as _apk
 import zipfile, hashlib, base64, re, sys, struct
 
-apk = r"D:\Vibes\ChaChaCha\CCC_fK_v7.7.0.apk"
+apk = _apk('kr')
 z = zipfile.ZipFile(apk)
 
 mf = z.read('META-INF/MANIFEST.MF').decode('utf-8','replace')
