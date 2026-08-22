@@ -8,9 +8,9 @@ cd "$(dirname "$0")/.."
 CN_APK="${CN_APK:-$(python -c 'import chapaths;print(chapaths.apk("cn"))')}"
 rm -rf overlay && mkdir -p overlay
 cp prefab_driver.bak overlay/51161fc3df9f94087a76edf2817d987a
-python deps.py "$PWD/survey/gogogoracer-1-4-3/assets/bin/Data" overlay @maproots9.txt @greekroots.txt >/dev/null 2>&1
+python tools/deps.py "$PWD/survey/gogogoracer-1-4-3/assets/bin/Data" overlay @maproots9.txt @greekroots.txt >/dev/null 2>&1
 for f in "$@"; do cp "overlay_aqua/$f" "overlay/$f"; done
-python buildapk.py "$CN_APK" chacn.apk \
+python tools/buildapk.py "$CN_APK" chacn.apk \
   --url "http://192.168.0.10:8888" \
   --orig "http://chachacha-server.wanyo.cn" --orig "https://chachacha-server.wanyo.cn" \
   --dll ACCN.dll --ue UECN.dll --overlay overlay >/dev/null 2>&1

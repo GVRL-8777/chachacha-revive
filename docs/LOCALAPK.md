@@ -100,7 +100,7 @@ get_initialVector:  return aes.Decrypt(_initialVector)
 `ChaLocalData.cs` 로 굽는다. 서버 쪽 표를 고쳤으면 이것만 다시 돌리면 된다.
 
 ```
-python mkskel.py
+python tools/mkskel.py
 ```
 
 ## 한 벌에 둘 다 — 판은 파일 한 줄이 정한다

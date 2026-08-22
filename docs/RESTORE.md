@@ -10,17 +10,17 @@ git checkout -- $(cat x77_changed.txt)      # 변경분 덮어쓰기
 
 `survey/` `kr/` `gogo142/` 는 다른 배포판을 푼 것이라 넣지 않았다.
 원본 APK 는 `chapaths.py` 가 찾는다 — `CHA_APK_DIR` 환경변수, `apk/`,
-저장소 폴더, 그 부모 순. `python chapaths.py` 로 무엇이 있는지 본다.
+저장소 폴더, 그 부모 순. `python tools/chapaths.py` 로 무엇이 있는지 본다.
 
 ## 빌드 순서
 
 ```sh
 sh scripts/builddll.sh                       # tunnelfix -> notutorial -> x77
-python sfmerge.py pack.dat cha @packspec.txt
-python derename.py pack.dat
-python mkbundle.py bundles/pack.unity3d pack.dat
-python pack.py base.apk chacn.apk x77
-python setappname.py chacn.apk chacn_ko.apk 一起车车车 "다함께 차차차"
+python tools/sfmerge.py pack.dat cha @packspec.txt
+python tools/derename.py pack.dat
+python tools/mkbundle.py bundles/pack.unity3d pack.dat
+python tools/pack.py base.apk chacn.apk x77
+python tools/setappname.py chacn.apk chacn_ko.apk 一起车车车 "다함께 차차차"
 jarsigner -keystore test.keystore -storepass android -keypass android chacn_ko.apk test
 adb install -r --bypass-low-target-sdk-block chacn_ko.apk
 ```
@@ -46,8 +46,8 @@ adb install -r --bypass-low-target-sdk-block chacn_ko.apk
 초대 횟수, 휴면 일수, 수신함, 공지사항, 스위치까지.
 
 ```sh
-python chalauncher.py              # http://localhost:8080 에서 편집
-python chalauncher.py 0.0.0.0      # 같은 망의 다른 기기에서도
+python tools/chalauncher.py              # http://localhost:8080 에서 편집
+python tools/chalauncher.py 0.0.0.0      # 같은 망의 다른 기기에서도
 ```
 
 서버는 켜질 때 이 파일을 읽고, 값이 바뀌면 바로 되쓴다.

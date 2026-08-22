@@ -25,7 +25,9 @@ from sfparse import parse
 from UnityPy.streams import EndianBinaryReader
 from UnityPy.files.SerializedFile import SerializedFile
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 TREE = os.path.join(HERE, 'x77')
 D = os.path.join(TREE, 'assets', 'bin', 'Data')
 LABEL_TEXT_OFF = 72          # UILabel 의 mText 가 시작하는 자리

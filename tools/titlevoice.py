@@ -28,7 +28,9 @@ from sfparse import parse
 from UnityPy.streams import EndianBinaryReader
 from UnityPy.files.SerializedFile import SerializedFile
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 # 진짜 한국판은 `kr` 입니다. 차 이름이 수리카·해미·매그넘 입니다.
 # (survey/racechachachaforkakao 는 이름이 Garuda·Hummie·Magnum 인
 #  동남아/영문판이라 보이스도 한국어가 아닙니다.)

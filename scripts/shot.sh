@@ -8,7 +8,7 @@ cd "$(dirname "$0")/.."
 CN_APK="${CN_APK:-$(python -c 'import chapaths;print(chapaths.apk("cn"))')}"
 IDX="$1"; OUT="$2"
 ./patchcn.exe mgcn/Assembly-CSharp.dll ACCN.dll mgcnr 300 server "$IDX" >/dev/null 2>&1
-python buildapk.py "$CN_APK" chacn.apk \
+python tools/buildapk.py "$CN_APK" chacn.apk \
   --url "http://192.168.0.10:8888" \
   --orig "http://chachacha-server.wanyo.cn" --orig "https://chachacha-server.wanyo.cn" \
   --dll ACCN.dll --ue UECN.dll --overlay overlay >/dev/null 2>&1

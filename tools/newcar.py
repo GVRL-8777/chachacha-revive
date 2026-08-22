@@ -34,7 +34,9 @@ from sfparse import parse
 import mktaegeuk
 from mktaegeuk import write_serialized, walk_pptr, load
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 TREE = os.path.join(HERE, 'x77')
 D = os.path.join(TREE, 'assets', 'bin', 'Data')
 # mktaegeuk.load 는 자기 모듈의 상대경로를 씁니다. 어느 폴더에서 부르든

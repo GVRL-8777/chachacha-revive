@@ -91,13 +91,13 @@ T('기록')       ->  History   (런처가 한 일)
 건드린다.**
 
 ```
-python langkeys.py                        모자란 것만 본다
-python langkeys.py --write                lang/*.json 을 맞춰 쓴다
-python langkeys.py --new ja --name 日本語  새 언어 뼈대를 만든다
+python tools/langkeys.py                        모자란 것만 본다
+python tools/langkeys.py --write                lang/*.json 을 맞춰 쓴다
+python tools/langkeys.py --new ja --name 日本語  새 언어 뼈대를 만든다
 ```
 
 ```
-python chatool.py <명령>          파이선이 있는 PC
+python tools/chatool.py <명령>          파이선이 있는 PC
 dist\chatool.exe <명령>           파이선이 없는 PC (pack-exe 로 만든다)
 ```
 
@@ -328,7 +328,7 @@ chatool build --mode local        로컬 전용 chacn_local.apk
 ## 파이선 없는 PC 용
 
 ```
-python chatool.py pack-exe     dist\chatool.exe 를 만든다
+python tools/chatool.py pack-exe     dist\chatool.exe 를 만든다
 ```
 exe 는 `dist\` 안에 떨어지는데, 거기서 그대로 실행해도 한 칸 위의
 작업 트리를 찾아 쓴다. exe 하나만 들고 가면 런처와 자산 도구가 그대로 돈다.
@@ -355,7 +355,7 @@ PyInstaller 가 조용히 실패하고 옛 exe 가 그대로 남는다.)
   **11명이 같은 더빙으로 통일**돼 있습니다 (`voicefix.py`, 되돌리려면 `--cn`).
 - 빌드 이름에 속지 마세요. `survey/racechachachaforkakao` 는 이름과 달리
   동남아/영문판입니다(차 이름이 Garuda·Hummie·Magnum).
-  `python langcheck.py <트리>` 로 언어를 판별할 수 있습니다.
+  `python tools/langcheck.py <트리>` 로 언어를 판별할 수 있습니다.
 
 ## 실기로 확인한 것
 

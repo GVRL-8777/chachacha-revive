@@ -29,7 +29,9 @@ from UnityPy.streams import EndianBinaryReader               # noqa: E402
 from UnityPy.files.SerializedFile import SerializedFile      # noqa: E402
 from sfparse import parse                                    # noqa: E402
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 PREFAB = os.path.join(HERE, 'x77', 'assets', 'bin', 'Data',
                       '51161fc3df9f94087a76edf2817d987a')
 

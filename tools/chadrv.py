@@ -27,7 +27,9 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import chaassets as A                                     # noqa: E402
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 DATA = os.path.join('assets', 'bin', 'Data')
 ATLAS_PID = 645                     # sharedassets0 안 UIAtlas(MonoBehaviour)
 ATLAS_TEX = 20                      # 같은 파일 안 Atlas_MainMenu 텍스처

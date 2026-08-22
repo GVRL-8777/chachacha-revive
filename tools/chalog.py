@@ -18,7 +18,9 @@ import os
 import threading
 import time
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 LOGFILE = os.path.join(HERE, 'chalog.jsonl')
 _LOCK = threading.Lock()
 MAX_LINES = 4000

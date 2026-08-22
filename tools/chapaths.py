@@ -21,7 +21,9 @@
 import glob
 import os
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 
 # 열쇠 -> (사람이 읽을 이름, 찾아볼 파일 이름들)
 #

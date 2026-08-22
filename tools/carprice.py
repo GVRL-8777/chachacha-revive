@@ -18,7 +18,9 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sfparse import parse
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 TREE = os.path.join(HERE, 'x77')
 CARDB = os.path.join('assets', 'bin', 'Data',
                      'ade64ecd8944d9640bb1438deb4f6fe3')

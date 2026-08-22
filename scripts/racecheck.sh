@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 # 원본 APK 자리는 chapaths 가 찾습니다 (CHA_APK_DIR 로 덮어쓸 수 있습니다)
 CN_APK="${CN_APK:-$(python -c 'import chapaths;print(chapaths.apk("cn"))')}"
 CHA_TUNNEL="$1" ./patchcn.exe mgcn/Assembly-CSharp.dll ACCN.dll mgcnr 300 server random >/dev/null 2>&1
-python buildapk.py "$CN_APK" chacn.apk \
+python tools/buildapk.py "$CN_APK" chacn.apk \
   --url "http://192.168.0.10:8888" \
   --orig "http://chachacha-server.wanyo.cn" --orig "https://chachacha-server.wanyo.cn" \
   --dll ACCN.dll --ue UECN.dll --overlay overlay >/dev/null 2>&1

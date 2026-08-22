@@ -15,10 +15,26 @@
 !/README.md
 !/LICENSE
 
-# 도구 · 서버 · 런처 · 패처 소스
-!/*.py
-!/*.cs
-!/*.sh
+# 도구 · 서버 · 런처
+!/tools/
+/tools/*
+!/tools/*.py
+
+# 패처 소스와 그 라이브러리 (게임에서 나온 것이 아님)
+!/patch/
+/patch/*
+!/patch/*.cs
+!/patch/Mono.Cecil.dll
+
+# 빌드 사슬과 잔심부름
+!/scripts/
+/scripts/*
+!/scripts/*.sh
+
+# 한 번 쓰고 만 조사용 스크립트
+!/research/
+/research/*
+!/research/*.py
 
 # 연구 기록
 !/docs/
@@ -30,34 +46,12 @@
 /lang/*
 !/lang/*.json
 
-# 패처가 쓰는 라이브러리 (게임에서 나온 것이 아님)
-!/Mono.Cecil.dll
-
 # 번들에 담을 목록 — 자산이 아니라 이름표만 적힌 텍스트 파일
 !/packspec.txt
 
 # ── 위에서 열렸지만 올리면 안 되는 것 ────────────────────────────────
-# 세션 부산물. AI 작업 중 임시 폴더를 가리키는 스크립트들이라
-# 사용자 폴더 이름이 그대로 박혀 있고, 연구물도 아닙니다.
-/mem*.py
-/audit_fixes.py
-/callers.py
-/crosscheck.py
-/enums.py
-/fldmap.py
-/fldrefs.py
-/listm.py
-/patchil.py
-/recover.py
-/recover2.py
-/replay_fixes.py
-/resload.py
-/revcheck.py
-/schema.py
-/vercheck.py
-
 # 창 런처(Flet). 저장소에서는 브라우저 런처 한 벌만 씁니다.
-/chaflet*.py
+tools/chaflet*.py
 
 # 개인적인 것
 /chastate.json

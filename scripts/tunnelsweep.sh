@@ -7,7 +7,7 @@ CN_APK="${CN_APK:-$(python -c 'import chapaths;print(chapaths.apk("cn"))')}"
 for i in 1 2 3; do
   case $i in 1) n=gtunnel;; 2) n=btunnel;; 3) n=bftunnel;; esac
   CHA_TUNNEL=$i ./patchcn.exe mgcn/Assembly-CSharp.dll ACCN.dll mgcnr 300 server random >/dev/null 2>&1
-  python buildapk.py "$CN_APK" chacn.apk \
+  python tools/buildapk.py "$CN_APK" chacn.apk \
     --url "http://192.168.0.10:8888" \
     --orig "http://chachacha-server.wanyo.cn" --orig "https://chachacha-server.wanyo.cn" \
     --dll ACCN.dll --ue UECN.dll --overlay overlay >/dev/null 2>&1

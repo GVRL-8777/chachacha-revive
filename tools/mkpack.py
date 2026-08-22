@@ -13,7 +13,9 @@ import os
 import subprocess
 import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 SPEC = os.path.join(HERE, 'packspec.txt')
 MERGED = os.path.join(HERE, 'pack.dat')
 OUT = os.path.join(HERE, 'bundles', 'pack.unity3d')

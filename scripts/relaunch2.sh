@@ -6,9 +6,9 @@ cd "$(dirname "$0")/.."
 # (예전에 carfix.py 가 죽어도 그냥 진행해 반쪽짜리 서버가 떴다)
 set -e
 W="${1:-80}"
-PYTHONIOENCODING=utf-8 python makecnserver.py >/dev/null 2>&1
-PYTHONIOENCODING=utf-8 python cnpatch.py 2>&1 | tail -1
-PYTHONIOENCODING=utf-8 python carfix.py 2>&1 | tail -1
+PYTHONIOENCODING=utf-8 python tools/makecnserver.py >/dev/null 2>&1
+PYTHONIOENCODING=utf-8 python tools/cnpatch.py 2>&1 | tail -1
+PYTHONIOENCODING=utf-8 python tools/carfix.py 2>&1 | tail -1
 # chacnserver.py 를 돌리는 파이썬을 확실히 끝낸다
 #  (포트로만 찾으면 옛 서버가 살아남아 예전 코드로 계속 응답한다)
 PYTHONIOENCODING=utf-8 python - <<'PYEOF'
@@ -30,7 +30,7 @@ for ln in o.splitlines():
 PYEOF
 sleep 2
 rm -f servercn.log
-(PYTHONIOENCODING=utf-8 python chacnserver.py 8888 > server_stdout.log 2>&1 &)
+(PYTHONIOENCODING=utf-8 python tools/chacnserver.py 8888 > server_stdout.log 2>&1 &)
 sleep 3
 adb reverse tcp:8888 tcp:8888 >/dev/null 2>&1
 adb shell am force-stop com.cjenm.chachacharevive

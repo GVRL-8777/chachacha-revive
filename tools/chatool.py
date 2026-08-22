@@ -38,7 +38,9 @@ import time
 if getattr(sys, 'frozen', False):
     HERE = os.path.dirname(os.path.abspath(sys.executable))
 else:
-    HERE = os.path.dirname(os.path.abspath(__file__))
+    CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 # pack-exe 로 구운 것은 dist/ 안에 떨어진다. 거기엔 작업 트리가 없으므로
 # 한 칸 위도 본다. 그래야 dist\chatool.exe 를 그 자리에서 바로 쓸 수 있다.
 if not os.path.isdir(os.path.join(HERE, 'x77')):
@@ -418,7 +420,8 @@ def _bake_save(slot, say):
 
 def _make_local_dll(say, force=False):
     """ChaLocal.dll 과 ACLOCAL.dll 을 (필요하면) 다시 만든다."""
-    src = [os.path.join(HERE, f) for f in ('ChaLocal.cs', 'ChaLocalData.cs')]
+    src = [os.path.join(HERE, 'patch', f)
+       for f in ('ChaLocal.cs', 'ChaLocalData.cs')]
     dll = os.path.join(HERE, 'ChaLocal.dll')
     if force or any(_newer(x, dll) for x in src):
         if not os.path.exists(CSC):
@@ -429,7 +432,7 @@ def _make_local_dll(say, force=False):
                 '      set CHA_CSC=<csc.exe 자리>' % CSC)
         r = _run([CSC, '-nologo', '-noconfig', '-target:library',
                   '-out:ChaLocal.dll', '-r:mgbase/UnityEngine.dll',
-                  'ChaLocal.cs', 'ChaLocalData.cs'], cwd=HERE)
+                  'patch/ChaLocal.cs', 'patch/ChaLocalData.cs'], cwd=HERE)
         if r.returncode != 0:
             say((r.stdout or '') + (r.stderr or ''))
             raise SystemExit('ChaLocal.dll 컴파일 실패')
@@ -576,7 +579,7 @@ def cmd_pack_exe(args):
             '--hidden-import', 'chahost', '--hidden-import', 'chalog',
             '--hidden-import', 'chaproj', '--hidden-import', 'chaskill',
             '--hidden-import', 'chadrv', '--hidden-import', 'chapick',
-            os.path.join(HERE, 'chatool.py')]
+            os.path.join(CODE, 'chatool.py')]
     print('PyInstaller 실행 중… (몇 분 걸린다)')
     r = subprocess.run(cmd, cwd=HERE)
     if r.returncode == 0:

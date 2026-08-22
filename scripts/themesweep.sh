@@ -9,7 +9,7 @@ NAMES="gbeach gbridge gcity gcliff gaqua bbeach bbridge bcity bfield bsand aqua"
 i=0
 for n in $NAMES; do
   ./patchcn.exe mgcn/Assembly-CSharp.dll ACCN.dll mgcnr 300 server "$i" >/dev/null 2>&1
-  python buildapk.py "$CN_APK" chacn.apk \
+  python tools/buildapk.py "$CN_APK" chacn.apk \
     --url "http://192.168.0.10:8888" \
     --orig "http://chachacha-server.wanyo.cn" --orig "https://chachacha-server.wanyo.cn" \
     --dll ACCN.dll --ue UECN.dll --overlay overlay >/dev/null 2>&1

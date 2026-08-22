@@ -171,12 +171,19 @@ unzip -p 5577.com.cjenm.chachachacn.apk AndroidManifest.xml | strings | grep cha
 ## 폴더 안내
 
 ```
-/            런처 · 서버 · 빌드에 쓰는 도구들 (서로 부르므로 한자리에)
-docs/        연구 기록
-patch/       Cecil 패처 소스 (.cs)
+tools/       런처 · 서버 · 빌드 도구. 서로 부르므로 한자리에 둡니다
+patch/       Cecil 패처 소스와 APK 에 들어갈 C# 코드
 scripts/     빌드 사슬과 잔심부름 (.sh)
 research/    한 번 쓰고 만 조사용 스크립트. 혼자 도는 것들입니다
+docs/        연구 기록
 lang/        런처의 말 (en · kr)
+```
+
+명령은 **저장소 뿌리에서** 실행합니다. `tools/` 안으로 들어가지 마세요.
+도구들은 뿌리를 작업 폴더로 보고 `x77/` · `saves/` · `lang/` 을 찾습니다.
+
+```
+python tools/chatool.py
 ```
 
 `research/` 는 자산을 뜯어보며 쓴 일회성 도구 모음입니다. 다른 데서
@@ -196,7 +203,7 @@ lang/        런처의 말 (en · kr)
 | **JDK** (`jarsigner`) | APK 서명 |
 | **Android SDK platform-tools** (`adb`) | 폰에 넣기 |
 | **.NET Framework csc** | IL 패처. `v4.0.30319` 로 패처를, `v3.5` 로 `ChaLocal.dll` 을 굽습니다 |
-| `Mono.Cecil.dll` | 패처가 씁니다 (저장소에 포함) |
+| `patch/Mono.Cecil.dll` | 패처가 씁니다 (저장소에 포함) |
 
 `csc` 자리도 알아서 찾습니다. 윈도우가 어느 드라이브에 깔렸든 상관없고,
 필요하면 `CHA_CSC` 로 짚어 주면 됩니다.
@@ -256,7 +263,7 @@ cp x77/assets/bin/Data/Managed/*.dll mgbase/
 파일 이름도 배포처마다 달라서 여러 이름을 두고 찾습니다.
 
 ```bash
-python chapaths.py          # 어느 것이 있고 없는지 한눈에
+python tools/chapaths.py          # 어느 것이 있고 없는지 한눈에
 ```
 
 ```
@@ -284,7 +291,7 @@ LINE 1.0.3 의 `tb_systemtext` 를 텍스트로 꺼내 `line_tb_systemtext.txt` 
 
 ```bash
 mkdir -p survey/line && unzip -o LINE_GoGoGo-1.0.3.apk -d survey/line
-python dump_systemtext.py survey/line line_tb_systemtext.txt
+python tools/dump_systemtext.py survey/line line_tb_systemtext.txt
 ```
 
 `키 = 값` 이 줄마다 늘어선 표가 나오면 맞습니다.
@@ -292,13 +299,13 @@ python dump_systemtext.py survey/line line_tb_systemtext.txt
 ### 2. 한국어화 + 소셜 건너뛰기
 
 ```bash
-python korean_res.py       # 시작 화면 · 런처 아이콘   (한국판에서 가져옴)
-python krtitle.py          # 타이틀 로고 一起车车车 -> 다함께 차차차
-python mkkorean.py         # 문자열표 갈아 끼우기      (LINE 판에서 가져옴)
-python bakedkr.py          # 프리팹에 박힌 중국어 라벨 78개
-python swapfont.py         # 한글 글리프가 있는 글꼴로
+python tools/korean_res.py       # 시작 화면 · 런처 아이콘   (한국판에서 가져옴)
+python tools/krtitle.py          # 타이틀 로고 一起车车车 -> 다함께 차차차
+python tools/mkkorean.py         # 문자열표 갈아 끼우기      (LINE 판에서 가져옴)
+python tools/bakedkr.py          # 프리팹에 박힌 중국어 라벨 78개
+python tools/swapfont.py         # 한글 글리프가 있는 글꼴로
 
-csc /nologo /target:exe /out:patchcn.exe /r:Mono.Cecil.dll patchcn.cs
+csc /nologo /target:exe /out:patchcn.exe /r:patch/Mono.Cecil.dll patchcn.cs
 
 # patchcn.exe <읽을 DLL> <쓸 DLL> <Managed 폴더> <지연 프레임>
 ./patchcn.exe mgbase/Assembly-CSharp.dll mgbase/Assembly-CSharp.dll \
@@ -341,10 +348,10 @@ sh scripts/builddll.sh
 0단계에서 이미 `survey/gogogoracer-1-4-3/` 로 풀어 두었으니 바로 시작합니다.
 
 ```bash
-python mapspec.py                       # 옮길 자산과 의존 파일 목록
-python sfmerge.py pack.dat cha @packspec.txt
-python derename.py pack.dat
-python mkbundle.py bundles/pack.unity3d pack.dat
+python tools/mapspec.py                       # 옮길 자산과 의존 파일 목록
+python tools/sfmerge.py pack.dat cha @packspec.txt
+python tools/derename.py pack.dat
+python tools/mkbundle.py bundles/pack.unity3d pack.dat
 ```
 
 테마 10종이 `bundles/pack.unity3d` 하나로 묶입니다. 게임은 이걸 로컬판이면
@@ -355,9 +362,9 @@ APK 안에서, 서버판이면 서버에서 받아 갑니다.
 여기부터는 도구 하나가 다 합니다.
 
 ```bash
-python chatool.py build --mode local     # 서버 없이 도는 판
-python chatool.py build --mode server    # PC 서버에 붙는 판
-python chatool.py build --mode both      # 한 벌에 둘 다 (게임 안에서 전환)
+python tools/chatool.py build --mode local     # 서버 없이 도는 판
+python tools/chatool.py build --mode server    # PC 서버에 붙는 판
+python tools/chatool.py build --mode both      # 한 벌에 둘 다 (게임 안에서 전환)
 ```
 
 속에서 이런 일이 일어납니다.
@@ -390,7 +397,7 @@ adb install -r --bypass-low-target-sdk-block chachacha_revive.apk
 굽는 것 말고도 대부분의 일을 창 하나에서 합니다.
 
 ```bash
-python chatool.py            # 브라우저에서 열립니다
+python tools/chatool.py            # 브라우저에서 열립니다
 ```
 
 파이썬이 없는 PC 라면 [릴리스](../../releases)의 `chatool.exe` 하나만
@@ -413,7 +420,7 @@ python chatool.py            # 브라우저에서 열립니다
 고쳐 볼 때 씁니다.
 
 ```bash
-python chacnserver.py 8888
+python tools/chacnserver.py 8888
 adb reverse tcp:8888 tcp:8888     # 폰의 127.0.0.1:8888 이 PC 로
 ```
 

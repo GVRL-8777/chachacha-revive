@@ -127,7 +127,7 @@
 - `taegeuk.assets` — 마지막 빌드 산출물
 
 **되살리는 법** (역순으로 뺐으니 그대로 다시 하면 된다)
-1. `python addtaegeuk.py` — CarDataBase 와 이름표 등록 (→ APK 재조립·설치)
+1. `python tools/addtaegeuk.py` — CarDataBase 와 이름표 등록 (→ APK 재조립·설치)
 2. `packspec.txt` 마지막에 한 줄:
    `taegeuk.assets:car/taegeukho/player_taegeukho_s:11:0:keepscript:also=car/taegeukho/materials/taegeukho@3:also=car/taegeukho/materials/taegeukho_low@3:also=car/taegeukho/taegeukho_low@11:also=car/taegeukho/taegeukho@11:also=car/taegeukho/player_taegeukho_s_low@11:mbptr=26@36:mbptr=26@44`
 3. `research/carfix.py` 에 `19: "S"` / `19: (0, 150)` / `SHOP_CARS` 에 19,

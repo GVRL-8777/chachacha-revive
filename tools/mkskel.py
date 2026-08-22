@@ -23,7 +23,7 @@ import chacnserver as S           # noqa: E402
 import chastate as C              # noqa: E402
 
 OUT_JSON = os.path.join(SP, 'chalocal_data.json')
-OUT_CS = os.path.join(SP, 'ChaLocalData.cs')
+OUT_CS = os.path.join(os.path.dirname(SP), 'patch', 'ChaLocalData.cs')
 
 
 def gather(preset=None, pkg='', save=None):

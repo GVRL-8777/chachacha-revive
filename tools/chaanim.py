@@ -32,7 +32,9 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import chaassets as A                                     # noqa: E402
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 # 메시 -> 그 메시를 입히는 프리팹. 만드는 데 몇 분 걸려 파일로 남긴다.
 RIGINDEX = os.path.join(HERE, 'riggedindex.json')
 

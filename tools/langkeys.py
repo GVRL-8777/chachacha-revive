@@ -19,7 +19,9 @@ import os
 import re
 import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
+HERE = os.path.dirname(CODE)
 sys.path.insert(0, HERE)
 
 KO = re.compile('[가-힣]')
@@ -56,16 +58,16 @@ def collect():
     keys |= set(lits(js, 'T'))
     keys |= set(lits(PA.ASSETS, 'T'))
 
-    keys |= set(lits(io.open(os.path.join(HERE, 'chatool.py'),
+    keys |= set(lits(io.open(os.path.join(CODE, 'chatool.py'),
                              encoding='utf-8').read(), '_msg'))
-    keys |= set(lits(io.open(os.path.join(HERE, 'chatool_assets.py'),
+    keys |= set(lits(io.open(os.path.join(CODE, 'chatool_assets.py'),
                              encoding='utf-8').read(), '_L'))
     # 표에 원문으로 둔 것 — 쓰는 자리에서 옮긴다
     import chatool_assets as A
     keys |= {d for _k, d, _e in A.FORMATS}
     keys |= {lab for _k, lab in A.CATS}
     for f in ('chasaves.py', 'chahost.py', 'chabuild.py'):
-        keys |= set(lits(io.open(os.path.join(HERE, f),
+        keys |= set(lits(io.open(os.path.join(CODE, f),
                                  encoding='utf-8').read(), 't'))
 
     # 표에 박아 둔 말 — 함수 호출이 아니라 훑기에 안 잡힌다
