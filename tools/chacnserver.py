@@ -17,7 +17,10 @@ import socketserver, threading, datetime, json, sys, os, base64, secrets, time, 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 
-SP = os.path.dirname(os.path.abspath(__file__))
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 코드는 tools/ 안에 있지만 **자료는 작업 폴더(그 위)** 에 있다.
+# apicn.json · bundles/ · 로그가 전부 거기다.
+SP = os.path.dirname(CODE)
 LOG = os.path.join(SP, "servercn.log")
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8888
 lock = threading.Lock()

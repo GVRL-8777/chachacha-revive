@@ -16,14 +16,16 @@ import sys
 
 SP = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SP)
+# 코드는 SP(tools/), 결과물은 작업 폴더에 둔다.
+ROOT = os.path.dirname(SP)
 _ARGV = list(sys.argv)
 sys.argv = [sys.argv[0]]          # chacnserver 가 argv[1] 을 포트로 읽는다
 
 import chacnserver as S           # noqa: E402
 import chastate as C              # noqa: E402
 
-OUT_JSON = os.path.join(SP, 'chalocal_data.json')
-OUT_CS = os.path.join(os.path.dirname(SP), 'patch', 'ChaLocalData.cs')
+OUT_JSON = os.path.join(ROOT, 'chalocal_data.json')
+OUT_CS = os.path.join(ROOT, 'patch', 'ChaLocalData.cs')
 
 
 def gather(preset=None, pkg='', save=None):

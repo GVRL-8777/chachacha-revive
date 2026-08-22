@@ -29,9 +29,10 @@ def build(quiet=False):
              if x.strip()])
     env = dict(os.environ, PYTHONIOENCODING='utf-8')
     steps = [
-        ([sys.executable, 'sfmerge.py', MERGED, 'pack', '@' + SPEC],
+        ([sys.executable, os.path.join(CODE, 'sfmerge.py'),
+          MERGED, 'pack', '@' + SPEC],
          '자산 %d개 합치기' % n),
-        ([sys.executable, 'mkbundle.py', OUT, MERGED, CAB], '번들 씌우기'),
+        ([sys.executable, os.path.join(CODE, 'mkbundle.py'), OUT, MERGED, CAB], '번들 씌우기'),
     ]
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     for cmd, label in steps:

@@ -33,14 +33,16 @@ import subprocess
 import sys
 import time
 
-# 얼려서(exe) 돌 때는 __file__ 이 임시 압축해제 폴더를 가리킨다.
-# 작업 폴더는 **실행파일이 놓인 자리**로 잡아야 x77/ · saves/ 를 찾는다.
+# CODE 는 도구가 놓인 자리, HERE 는 작업 트리(x77 · saves · lang …)가 있는 자리다.
 if getattr(sys, 'frozen', False):
-    HERE = os.path.dirname(os.path.abspath(sys.executable))
+    # 얼려서(exe) 돌 때는 __file__ 이 임시 압축해제 폴더를 가리킨다.
+    # 작업 폴더는 **실행파일이 놓인 자리**로 잡아야 x77/ · saves/ 를 찾는다.
+    CODE = os.path.dirname(os.path.abspath(sys.executable))
+    HERE = CODE
 else:
+    # 도구는 tools/ 안에 있고, 작업 트리는 그 위에 있다.
     CODE = os.path.dirname(os.path.abspath(__file__))
-# 도구는 tools/ 안에 있고, 작업 트리(x77 · saves · lang …)는 그 위에 있다.
-HERE = os.path.dirname(CODE)
+    HERE = os.path.dirname(CODE)
 # pack-exe 로 구운 것은 dist/ 안에 떨어진다. 거기엔 작업 트리가 없으므로
 # 한 칸 위도 본다. 그래야 dist\chatool.exe 를 그 자리에서 바로 쓸 수 있다.
 if not os.path.isdir(os.path.join(HERE, 'x77')):
@@ -408,7 +410,7 @@ def _bake_save(slot, say):
     APK 는 한 벌이므로 여기가 유일한 '판' 이다. 다른 상태로 시작하고
     싶으면 세이브를 바꿔 굽거나, 폰에 세이브를 넣으면 된다."""
     env = dict(os.environ, PYTHONIOENCODING='utf-8')
-    cmd = ['python', 'mkskel.py', '--pkg', PKG]
+    cmd = [sys.executable, os.path.join(CODE, 'mkskel.py'), '--pkg', PKG]
     if slot and slot in slots():
         cmd += ['--save', slot_path(slot)]
     r = _run(cmd, cwd=HERE, env=env)
@@ -418,8 +420,22 @@ def _bake_save(slot, say):
     say('구워 넣는 세이브: %s' % (slot or '(기본값)'))
 
 
+def _ensure_cecil():
+    """Cecil 로 만든 패처 exe 들은 Mono.Cecil.dll 이 **제 옆에** 있어야 돈다.
+
+    .NET 은 어셈블리를 실행파일이 놓인 폴더에서 찾는다. 저장소에서는 그 DLL 을
+    patch/ 에 두므로, 패처를 돌리기 전에 작업 폴더로 한 벌 가져다 놓는다.
+    """
+    src = os.path.join(HERE, 'patch', 'Mono.Cecil.dll')
+    dst = os.path.join(HERE, 'Mono.Cecil.dll')
+    if os.path.exists(src) and _newer(src, dst):
+        shutil.copy2(src, dst)
+    return dst
+
+
 def _make_local_dll(say, force=False):
     """ChaLocal.dll 과 ACLOCAL.dll 을 (필요하면) 다시 만든다."""
+    _ensure_cecil()
     src = [os.path.join(HERE, 'patch', f)
        for f in ('ChaLocal.cs', 'ChaLocalData.cs')]
     dll = os.path.join(HERE, 'ChaLocal.dll')
@@ -430,9 +446,10 @@ def _make_local_dll(say, force=False):
                 '  찾아본 자리: %s\n'
                 '  윈도우에서 .NET Framework 3.5 를 켜거나, 자리를 알려 주세요:\n'
                 '      set CHA_CSC=<csc.exe 자리>' % CSC)
+        # csc(v3.5) 는 슬래시를 옵션 머리로 보므로 소스는 **절대 경로**로 준다.
         r = _run([CSC, '-nologo', '-noconfig', '-target:library',
-                  '-out:ChaLocal.dll', '-r:mgbase/UnityEngine.dll',
-                  'patch/ChaLocal.cs', 'patch/ChaLocalData.cs'], cwd=HERE)
+                  '-out:ChaLocal.dll', '-r:mgbase/UnityEngine.dll'] + src,
+                 cwd=HERE)
         if r.returncode != 0:
             say((r.stdout or '') + (r.stderr or ''))
             raise SystemExit('ChaLocal.dll 컴파일 실패')
@@ -504,10 +521,12 @@ def build_apk(mode, slot=None, out=None, install=False, say=print):
     _stage(mode, say, slot)
     out = out or 'chachacha_revive.apk'
     steps = [
-        (['python', 'pack.py', 'base.apk', 'chacn.apk', 'x77'], 'APK 재조립'),
-        (['python', 'setappname.py', 'chacn.apk', '_named.apk',
+        ([sys.executable, os.path.join(CODE, 'pack.py'),
+          'base.apk', 'chacn.apk', 'x77'], 'APK 재조립'),
+        ([sys.executable, os.path.join(CODE, 'setappname.py'), 'chacn.apk', '_named.apk',
           '一起车车车', APP_LABEL], '앱 이름'),
-        (['python', 'setpkg.py', '_named.apk', out, PKG], '패키지 이름'),
+        ([sys.executable, os.path.join(CODE, 'setpkg.py'),
+          '_named.apk', out, PKG], '패키지 이름'),
         (['jarsigner', '-keystore', 'test.keystore', '-storepass', 'android',
           '-keypass', 'android', out, 'test'], '서명'),
     ]

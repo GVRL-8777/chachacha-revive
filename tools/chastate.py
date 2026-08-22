@@ -19,8 +19,10 @@ import io
 import json
 import os
 
-STATE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                          'chastate.json')
+CODE = os.path.dirname(os.path.abspath(__file__))
+# 코드는 tools/ 안이지만 **상태 파일은 작업 폴더(그 위)** 에 있다.
+ROOT = os.path.dirname(CODE)
+STATE_PATH = os.path.join(ROOT, 'chastate.json')
 
 # 서버 carNo(= CarDataBase 의 CarIndex + 1) -> 이름 · 시작 등급
 CARS = [
@@ -39,8 +41,7 @@ CARS = [
 def _load_newcars():
     import io as _io
     import json as _json
-    p = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                     'newcars.json')
+    p = os.path.join(ROOT, 'newcars.json')
     if not os.path.exists(p):
         return []
     try:
