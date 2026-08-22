@@ -1,12 +1,14 @@
 #!/bin/sh
 # 빌드 -> 설치 -> 캐릭터 화면 위/아래 촬영
+: "${CHA_URL:?PC 서버 주소를 알려 주세요 — 예: export CHA_URL=http://192.168.0.100:8888}"
+
 set -e
 # scripts/ 안에 있지만 일감은 저장소 뿌리에서 돕니다
 cd "$(dirname "$0")/.."
 # 원본 APK 자리는 chapaths 가 찾습니다 (CHA_APK_DIR 로 덮어쓸 수 있습니다)
 CN_APK="${CN_APK:-$(python -c 'import chapaths;print(chapaths.apk("cn"))')}"
 python tools/buildapk.py "$CN_APK" chacn.apk \
-  --url "http://192.168.0.10:8888" \
+  --url "$CHA_URL" \
   --orig "http://chachacha-server.wanyo.cn" --orig "https://chachacha-server.wanyo.cn" \
   --dll ACCN.dll --ue UECN.dll --overlay overlay >/dev/null 2>&1
 jarsigner -keystore test.keystore -storepass android -keypass android chacn.apk test >/dev/null 2>&1

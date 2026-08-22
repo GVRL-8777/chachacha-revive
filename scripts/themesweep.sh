@@ -2,6 +2,8 @@
 # 이식한 테마 11종을 하나씩 시작 맵으로 고정해 주행 화면을 찍는다.
 # 어느 테마의 지형이 비어 보이는지 눈으로 가려내기 위한 것이다.
 # scripts/ 안에 있지만 일감은 저장소 뿌리에서 돕니다
+: "${CHA_URL:?PC 서버 주소를 알려 주세요 — 예: export CHA_URL=http://192.168.0.100:8888}"
+
 cd "$(dirname "$0")/.."
 # 원본 APK 자리는 chapaths 가 찾습니다 (CHA_APK_DIR 로 덮어쓸 수 있습니다)
 CN_APK="${CN_APK:-$(python -c 'import chapaths;print(chapaths.apk("cn"))')}"
@@ -10,7 +12,7 @@ i=0
 for n in $NAMES; do
   ./patchcn.exe mgcn/Assembly-CSharp.dll ACCN.dll mgcnr 300 server "$i" >/dev/null 2>&1
   python tools/buildapk.py "$CN_APK" chacn.apk \
-    --url "http://192.168.0.10:8888" \
+    --url "$CHA_URL" \
     --orig "http://chachacha-server.wanyo.cn" --orig "https://chachacha-server.wanyo.cn" \
     --dll ACCN.dll --ue UECN.dll --overlay overlay >/dev/null 2>&1
   jarsigner -keystore test.keystore -storepass android -keypass android chacn.apk test >/dev/null 2>&1

@@ -1,12 +1,14 @@
 #!/bin/sh
 # 지정한 터널 세트로 한 판 달리며 8장을 찍는다. 사용법: sh racecheck.sh <세트번호> <꼬리표>
 # scripts/ 안에 있지만 일감은 저장소 뿌리에서 돕니다
+: "${CHA_URL:?PC 서버 주소를 알려 주세요 — 예: export CHA_URL=http://192.168.0.100:8888}"
+
 cd "$(dirname "$0")/.."
 # 원본 APK 자리는 chapaths 가 찾습니다 (CHA_APK_DIR 로 덮어쓸 수 있습니다)
 CN_APK="${CN_APK:-$(python -c 'import chapaths;print(chapaths.apk("cn"))')}"
 CHA_TUNNEL="$1" ./patchcn.exe mgcn/Assembly-CSharp.dll ACCN.dll mgcnr 300 server random >/dev/null 2>&1
 python tools/buildapk.py "$CN_APK" chacn.apk \
-  --url "http://192.168.0.10:8888" \
+  --url "$CHA_URL" \
   --orig "http://chachacha-server.wanyo.cn" --orig "https://chachacha-server.wanyo.cn" \
   --dll ACCN.dll --ue UECN.dll --overlay overlay >/dev/null 2>&1
 jarsigner -keystore test.keystore -storepass android -keypass android chacn.apk test >/dev/null 2>&1

@@ -6,6 +6,12 @@
           Load("Data_Gbeach01", typeof(GameObject)) 결과를 로그로 찍는다
 """
 import io
+import os
+
+# 폰이 PC 를 어느 주소로 부를지. 랜이면 PC 의 랜 주소를 적어 주면 된다.
+#     export CHA_URL=http://192.168.0.100:8888
+BASE = os.environ.get('CHA_URL', 'http://127.0.0.1:8888').rstrip('/')
+BUNDLE_URL = BASE + '/bundle/greece.unity3d'
 
 # ---------- 서버 ----------
 p = 'chacnserver.py'
@@ -149,7 +155,7 @@ if '__ChaBundleTick' not in s2:
     s2 = s2.replace(anchor, add, 1)
     s2 = s2.replace('        string mode = a.Length > 4 ? a[4] : "guest";   // guest | server',
                     '        string mode = a.Length > 4 ? a[4] : "guest";   // guest | server\n'
-                    '        const string BUNDLE_URL = "http://192.168.0.10:8888/bundle/greece.unity3d";\n'
+                    '        const string BUNDLE_URL = "%s";\n' % BUNDLE_URL +
                     '        const string ASSET_NAME = "Data_Gbeach01";')
     io.open(p2, 'w', encoding='utf-8').write(s2)
     print('patchcn.cs: 번들 검증 코드 추가')

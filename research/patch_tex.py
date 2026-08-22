@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 """dbhook.cs 에 '도로 텍스처를 WWW 로 받아 원본 재질에 붙이는' 패치를 추가한다."""
 import io
+import os
+
+# 폰이 PC 를 어느 주소로 부를지. 랜이면 PC 의 랜 주소를 적어 주면 된다.
+#     export CHA_URL=http://192.168.0.100:8888
+TEX_URL = os.environ.get('CHA_URL', 'http://127.0.0.1:8888').rstrip('/') + '/tex/'
 
 p = 'dbhook.cs'
 s = io.open(p, encoding='utf-8').read()
@@ -9,7 +14,7 @@ s = io.open(p, encoding='utf-8').read()
 old_arg = 'string cutAfter = args.Length > 6 ? args[6] : "mCollider";'
 new_arg = (old_arg + '\n'
            '        string texUrl = args.Length > 7 ? args[7] '
-           ': "http://192.168.0.10:8888/tex/";')
+           ': "%s";' % TEX_URL)
 if 'texUrl' not in s:
     assert old_arg in s
     s = s.replace(old_arg, new_arg, 1)

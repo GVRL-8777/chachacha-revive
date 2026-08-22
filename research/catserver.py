@@ -13,7 +13,8 @@ import socketserver, threading, datetime, json, sys, os
 
 SP = os.path.dirname(os.path.abspath(__file__))
 LOG = os.path.join(SP, "cat_hits.log")
-GAME = sys.argv[2] if len(sys.argv) > 2 else "http://192.168.0.10:8888"
+GAME = (sys.argv[2] if len(sys.argv) > 2
+        else os.environ.get("CHA_URL", "http://127.0.0.1:8888"))
 lock = threading.Lock()
 
 def log(m):

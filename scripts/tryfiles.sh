@@ -1,6 +1,8 @@
 #!/bin/sh
 # overlay 에 지정한 파일들만 추가로 넣고 빌드/설치/레이스까지 확인한다.
 # 사용법: sh tryfiles.sh <파일명> ...
+: "${CHA_URL:?PC 서버 주소를 알려 주세요 — 예: export CHA_URL=http://192.168.0.100:8888}"
+
 set -e
 # scripts/ 안에 있지만 일감은 저장소 뿌리에서 돕니다
 cd "$(dirname "$0")/.."
@@ -11,7 +13,7 @@ cp prefab_driver.bak overlay/51161fc3df9f94087a76edf2817d987a
 python tools/deps.py "$PWD/survey/gogogoracer-1-4-3/assets/bin/Data" overlay @maproots9.txt @greekroots.txt >/dev/null 2>&1
 for f in "$@"; do cp "overlay_aqua/$f" "overlay/$f"; done
 python tools/buildapk.py "$CN_APK" chacn.apk \
-  --url "http://192.168.0.10:8888" \
+  --url "$CHA_URL" \
   --orig "http://chachacha-server.wanyo.cn" --orig "https://chachacha-server.wanyo.cn" \
   --dll ACCN.dll --ue UECN.dll --overlay overlay >/dev/null 2>&1
 jarsigner -keystore test.keystore -storepass android -keypass android chacn.apk test >/dev/null 2>&1

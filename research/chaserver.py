@@ -27,7 +27,8 @@ UNIMPL = os.path.join(SP, "unimplemented.log")
 SCHEMA = os.path.join(SP, "api_schema.txt")
 
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8888
-GAME = sys.argv[2] if len(sys.argv) > 2 else "http://192.168.0.10:%d" % PORT
+GAME = (sys.argv[2] if len(sys.argv) > 2
+        else os.environ.get("CHA_URL", "http://127.0.0.1:%d" % PORT))
 
 lock = threading.Lock()
 

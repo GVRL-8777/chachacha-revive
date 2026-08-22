@@ -1,6 +1,8 @@
 #!/bin/sh
 # 테마 하나를 고정한 빌드를 만들어 설치하고, 레이스 중 화면을 한 장 찍는다.
 # 사용법: sh shot.sh <테마번호> <출력png>
+: "${CHA_URL:?PC 서버 주소를 알려 주세요 — 예: export CHA_URL=http://192.168.0.100:8888}"
+
 set -e
 # scripts/ 안에 있지만 일감은 저장소 뿌리에서 돕니다
 cd "$(dirname "$0")/.."
@@ -9,7 +11,7 @@ CN_APK="${CN_APK:-$(python -c 'import chapaths;print(chapaths.apk("cn"))')}"
 IDX="$1"; OUT="$2"
 ./patchcn.exe mgcn/Assembly-CSharp.dll ACCN.dll mgcnr 300 server "$IDX" >/dev/null 2>&1
 python tools/buildapk.py "$CN_APK" chacn.apk \
-  --url "http://192.168.0.10:8888" \
+  --url "$CHA_URL" \
   --orig "http://chachacha-server.wanyo.cn" --orig "https://chachacha-server.wanyo.cn" \
   --dll ACCN.dll --ue UECN.dll --overlay overlay >/dev/null 2>&1
 jarsigner -keystore test.keystore -storepass android -keypass android chacn.apk test >/dev/null 2>&1

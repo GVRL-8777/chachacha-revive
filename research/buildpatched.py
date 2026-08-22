@@ -9,7 +9,7 @@
    파일 시프트 없이 제자리 패치가 된다. 경로는 우리가 서버를 만드니 자유.
 
 사용법: python buildpatched.py <base_url> <out.apk>
-   예:  python buildpatched.py http://192.168.0.10:8888/ out.apk
+   예:  python buildpatched.py http://192.168.0.100:8888/ out.apk
 """
 from _here import apk
 import zipfile, struct, sys, os

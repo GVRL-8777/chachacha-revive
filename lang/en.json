@@ -58,7 +58,7 @@
   "PC 에서 `python chacnserver.py` 를 띄웁니다": "Start `python chacnserver.py` on the PC",
   "PC 와 USB 로 이은 채로만 붙습니다. 공유기도 IP 도 필요 없어 시험할 때 가장 편합니다.": "Works only while the phone is plugged into the PC. No router and no IP needed, which makes it the easiest way to test.",
   "PC 와 폰에 같은 메시를 깔고 같은 계정으로 붙입니다": "Install the same mesh on both and sign in with the same account",
-  "PC 의 랜 IP 를 적습니다 (예: 192.168.0.10)": "Enter the PC's LAN IP (for example 192.168.0.10)",
+  "PC 의 랜 IP 를 적습니다 (예: 192.168.0.100)": "Enter the PC's LAN IP (for example 192.168.0.100)",
   "PC 의 메시 IP 를 적습니다 (예: 100.101.102.103)": "Enter the PC's mesh IP (for example 100.101.102.103)",
   "PNG 를 여기에 끌어다 놓거나 눌러서 고르세요": "Drop a PNG here, or click to choose one",
   "STL — 3D 프린터·조형용(색과 UV 는 못 담습니다)": "STL — for 3D printing and sculpting (no colour, no UVs)",

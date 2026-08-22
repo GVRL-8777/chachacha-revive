@@ -1,0 +1,13 @@
+# 줄 끝은 저장소 안에서 LF 로 통일합니다.
+# 윈도우에서 받아도 편집기가 알아서 봐 주고, 리눅스에서 sh 를 돌릴 때
+# CRLF 때문에 "bad interpreter" 로 죽는 일이 없습니다.
+* text=auto eol=lf
+
+# 셸 스크립트는 반드시 LF 여야 합니다.
+*.sh text eol=lf
+
+# 건드리면 안 되는 것
+*.dll binary
+*.exe binary
+*.png binary
+*.apk binary
