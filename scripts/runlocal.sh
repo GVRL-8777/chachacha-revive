@@ -7,7 +7,8 @@
 # 폰이 PC 쪽으로 갈 길을 아예 막은 뒤 실행한다.
 #
 #   sh runlocal.sh [대기초]
-cd "$(dirname "$0")"
+# scripts/ 안에 있지만 일감은 저장소 뿌리에서 돕니다
+cd "$(dirname "$0")/.."
 set -e
 W="${1:-60}"
 

@@ -36,7 +36,7 @@ CarIndex 는 안 쓰는 번호 중 가장 작은 것을 고릅니다.
 ## 표는 한 곳에서만 고칩니다
 
 `newcars.json` 한 파일을 `chastate.py`(세이브·런처)와
-`carfix.py`(서버)가 읽어 각자의 표에 얹습니다. 새 차는 상점 매물로
+`research/carfix.py`(서버)가 읽어 각자의 표에 얹습니다. 새 차는 상점 매물로
 들어가므로 게임 안에서 사서 타면 됩니다.
 
 로컬 전용 APK 는 `mkskel.py` 가 서버 표를 떠서 `ChaLocalData.cs` 로
@@ -47,7 +47,7 @@ newcar → carfix.py (서버 표) → mkskel.py → chatool build --mode local
 ```
 
 `chatool build` 는 이 중 마지막만 합니다. 새 차를 넣은 뒤에는
-`relaunch2.sh`(서버판) 또는 위 순서(로컬판)를 한 번 돌리세요.
+`scripts/relaunch2.sh`(서버판) 또는 위 순서(로컬판)를 한 번 돌리세요.
 
 ## 실기로 확인한 것
 
@@ -64,7 +64,7 @@ chatool newcar Testcar --remove
 넣을 때 공백 자리에 밀어 넣었으니 뺄 때도 **같은 길이의 공백**으로
 되돌려 파일 길이를 지킵니다. 이름표·packspec·번들·`newcars.json`·
 `<이름>.assets` 까지 함께 정리합니다. 그다음 서버 표를 다시 만들고
-(`carfix.py` → `mkskel.py`) APK 를 다시 만드세요.
+(`research/carfix.py` → `mkskel.py`) APK 를 다시 만드세요.
 
 시험용으로 넣었던 `시험차`(carNo 19)는 이 경로로 깨끗이 뺐습니다
 — CarDataBase 30대, 이름표·번들·APK 어디에도 남지 않았습니다.

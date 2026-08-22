@@ -21,7 +21,7 @@
 | **통합 도구 chatool** | 완료. 세이브 런처 + 자산 뽑기/칠하기/들여오기 + 빌드. `TOOL.md` |
 
 ### 가챠 손댈 곳
-`carfix.py` 의 `GACHA_CARS` · `GACHA_COST` · `GACHA_RETRY_COST` · `GACHA_ODDS`.
+`research/carfix.py` 의 `GACHA_CARS` · `GACHA_COST` · `GACHA_RETRY_COST` · `GACHA_ODDS`.
 지금 확률은 C 45 / B 30 / A 20 / **S 5** 다. 대상은 CarDataBase 에서
 `IsGotyaEvent` 인 6대(사이클론 · 허리케인 · 피닉스 · 헤비수리카 · 슈퍼엠페러 · 썬더).
 
@@ -39,7 +39,7 @@
 | `TradeCarPop.m_CarList` (Dictionary) 를 **아무 데서도 생성하지 않음**. 생성자가 7바이트 | 팝업 열자마자 `Build()` 첫 `Add` 에서 널참조 | `tradefix.exe` 가 생성자 `ret` 앞에 `newobj Dictionary` 추가 |
 | `m_CarClassSprite_SellName/BuyName` 프리팹 참조가 (0,0), `m_TitleName` 은 아예 직렬화 안 됨 | `SetCarNameBoard`·`Build` 에서 널참조 | `tradeui.py` 가 프리팹 PPtr 2곳을 살아 있는 스프라이트로 교체(길이 보존), `tradefix.exe` 가 제목라벨 문장을 IL 에서 제거 |
 
-값은 `carfix.py` 의 `TRADE_CLASS_VALUE`(C 0 / B 14 / A 50 / S 120 / R 200) 와
+값은 `research/carfix.py` 의 `TRADE_CLASS_VALUE`(C 0 / B 14 / A 50 / S 120 / R 200) 와
 `TRADE_LEVEL_VALUE`(레벨 1~4 → 0 / 5 / 10 / 20)에 있다. 클라이언트는
 **같은 등급 줄의 값 + 각 항목이 (레벨+1) 인 줄의 값**을 더한다
 (`TradeCarValueDB.GetDiscountTrophy`). 1부터 세는 규칙이 여기도 적용된다.
@@ -130,7 +130,7 @@
 1. `python addtaegeuk.py` — CarDataBase 와 이름표 등록 (→ APK 재조립·설치)
 2. `packspec.txt` 마지막에 한 줄:
    `taegeuk.assets:car/taegeukho/player_taegeukho_s:11:0:keepscript:also=car/taegeukho/materials/taegeukho@3:also=car/taegeukho/materials/taegeukho_low@3:also=car/taegeukho/taegeukho_low@11:also=car/taegeukho/taegeukho@11:also=car/taegeukho/player_taegeukho_s_low@11:mbptr=26@36:mbptr=26@44`
-3. `carfix.py` 에 `19: "S"` / `19: (0, 150)` / `SHOP_CARS` 에 19,
+3. `research/carfix.py` 에 `19: "S"` / `19: (0, 150)` / `SHOP_CARS` 에 19,
    `chastate.py` CARS 에 `(19, "Taegeukho", "S")`
 4. sfmerge → mkbundle → relaunch2
 

@@ -1,6 +1,7 @@
 #!/bin/sh
 # 차차차2 계열 APK 전부를 풀어 차차차1 흔적 토큰을 훑는다.
-cd "$(dirname "$0")"
+# scripts/ 안에 있지만 일감은 저장소 뿌리에서 돕니다
+cd "$(dirname "$0")/.."
 out=sweep_result.txt
 : > "$out"
 # 차차차 2 APK 를 모아 둔 폴더. CHA2_DIR 로 알려 주세요.

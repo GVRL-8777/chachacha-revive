@@ -168,6 +168,23 @@ unzip -p 5577.com.cjenm.chachachacn.apk AndroidManifest.xml | strings | grep cha
 
 ---
 
+## 폴더 안내
+
+```
+/            런처 · 서버 · 빌드에 쓰는 도구들 (서로 부르므로 한자리에)
+docs/        연구 기록
+patch/       Cecil 패처 소스 (.cs)
+scripts/     빌드 사슬과 잔심부름 (.sh)
+research/    한 번 쓰고 만 조사용 스크립트. 혼자 도는 것들입니다
+lang/        런처의 말 (en · kr)
+```
+
+`research/` 는 자산을 뜯어보며 쓴 일회성 도구 모음입니다. 다른 데서
+부르지 않으니 안 쓰셔도 되고, 무엇을 어떻게 알아냈는지 궁금하실 때
+들여다보시면 됩니다.
+
+---
+
 ## 필요한 것
 
 | | 왜 |
@@ -300,7 +317,7 @@ csc /nologo /target:exe /out:patchcn.exe /r:Mono.Cecil.dll patchcn.cs
 ### 3. 기능 패처 사슬
 
 ```bash
-sh builddll.sh
+sh scripts/builddll.sh
 ```
 
 여덟 개를 차례로 겁니다. **순서를 지켜야 합니다** — 앞의 것이 만든 함수를

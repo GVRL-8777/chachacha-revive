@@ -1,7 +1,8 @@
 #!/bin/sh
 # 드라이버(캐릭터) 목록 화면까지 들어가 위/아래를 각각 찍는다.
 set -e
-cd "$(dirname "$0")"
+# scripts/ 안에 있지만 일감은 저장소 뿌리에서 돕니다
+cd "$(dirname "$0")/.."
 adb shell input keyevent KEYCODE_HOME >/dev/null 2>&1
 adb shell am force-stop com.cjenm.chachacharevive
 sleep 3

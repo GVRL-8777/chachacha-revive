@@ -1,6 +1,7 @@
 #!/bin/sh
 # 이미 설치된 빌드로 한 판 달리며 사진을 찍는다. 사용법: sh race.sh <꼬리표> [장수]
-cd "$(dirname "$0")"
+# scripts/ 안에 있지만 일감은 저장소 뿌리에서 돕니다
+cd "$(dirname "$0")/.."
 TAG="${1:-run}"
 N="${2:-10}"
 adb shell input keyevent KEYCODE_HOME >/dev/null 2>&1

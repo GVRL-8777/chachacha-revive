@@ -15,7 +15,7 @@ git checkout -- $(cat x77_changed.txt)      # 변경분 덮어쓰기
 ## 빌드 순서
 
 ```sh
-sh builddll.sh                       # tunnelfix -> notutorial -> x77
+sh scripts/builddll.sh                       # tunnelfix -> notutorial -> x77
 python sfmerge.py pack.dat cha @packspec.txt
 python derename.py pack.dat
 python mkbundle.py bundles/pack.unity3d pack.dat
@@ -25,9 +25,9 @@ jarsigner -keystore test.keystore -storepass android -keypass android chacn_ko.a
 adb install -r --bypass-low-target-sdk-block chacn_ko.apk
 ```
 
-서버는 `sh relaunch2.sh` 하나로 다시 만들고 띄운다
-(`makecnserver.py` -> `cnpatch.py` -> `carfix.py` -> 실행).
-**서버 코드를 고칠 때는 `chacnserver.py` 가 아니라 `carfix.py` 를 고쳐야 한다.**
+서버는 `sh scripts/relaunch2.sh` 하나로 다시 만들고 띄운다
+(`research/makecnserver.py` -> `research/cnpatch.py` -> `research/carfix.py` -> 실행).
+**서버 코드를 고칠 때는 `chacnserver.py` 가 아니라 `research/carfix.py` 를 고쳐야 한다.**
 그 파일은 매번 새로 만들어지므로 직접 고치면 다음 실행에 사라진다.
 
 ## 한국어화 도구
@@ -36,7 +36,7 @@ adb install -r --bypass-low-target-sdk-block chacn_ko.apk
 |---|---|
 | `korean_res.py` | 시작 화면(360手机助手) · 런처 아이콘 |
 | `krtitle.py` | 타이틀 로고 一起车车车 -> 다함께 차차차 |
-| `notutorial.cs` | 중국판 전용 도움말 팝업 4개 끄기 |
+| `patch/notutorial.cs` | 중국판 전용 도움말 팝업 4개 끄기 |
 | `setappname.py` | resources.arsc 의 앱 이름 |
 
 ## 상태 파일과 런처

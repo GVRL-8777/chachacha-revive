@@ -2,7 +2,8 @@
 # 테마 하나를 고정한 빌드를 만들어 설치하고, 레이스 중 화면을 한 장 찍는다.
 # 사용법: sh shot.sh <테마번호> <출력png>
 set -e
-cd "$(dirname "$0")"
+# scripts/ 안에 있지만 일감은 저장소 뿌리에서 돕니다
+cd "$(dirname "$0")/.."
 # 원본 APK 자리는 chapaths 가 찾습니다 (CHA_APK_DIR 로 덮어쓸 수 있습니다)
 CN_APK="${CN_APK:-$(python -c 'import chapaths;print(chapaths.apk("cn"))')}"
 IDX="$1"; OUT="$2"

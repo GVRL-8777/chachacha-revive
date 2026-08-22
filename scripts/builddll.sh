@@ -18,7 +18,8 @@
 # (자세한 것은 LOCALAPK.md)
 #
 # 순서를 지켜야 한다. tunnelfix 가 만든 __ChaResLoad 를 도움말 팝업도 쓴다.
-cd "$(dirname "$0")"
+# scripts/ 안에 있지만 일감은 저장소 뿌리에서 돕니다
+cd "$(dirname "$0")/.."
 set -e
 ./tunnelfix.exe mgbase/Assembly-CSharp.dll ACtmp.dll mgbase "${CHA_BUNDLE_URL:-http://127.0.0.1:8888/bundle/pack.unity3d}" | tail -3
 ./notutorial.exe ACtmp.dll ACtmp2.dll | tail -2

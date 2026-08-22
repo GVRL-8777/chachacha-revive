@@ -214,9 +214,9 @@ adb logcat -d | grep -a ChaLocal
 | `ChaLocal.cs` | 미니 JSON · 세이브 입출력 · 처리기 30개 · 관문 |
 | `ChaLocalData.cs` | 자동 생성. 서버에서 떠 온 표 전부 |
 | `mkskel.py` | 그 표를 뜨는 도구 |
-| `localfix.cs` | Cecil 패처 |
-| `chkrefs.cs` | 참조가 실제로 풀리는지 검사 |
-| `runlocal.sh` | 서버를 죽이고 로컬판만으로 띄워 보는 시험 |
+| `patch/localfix.cs` | Cecil 패처 |
+| `patch/chkrefs.cs` | 참조가 실제로 풀리는지 검사 |
+| `scripts/runlocal.sh` | 서버를 죽이고 로컬판만으로 띄워 보는 시험 |
 
 ## 패키지 이름
 

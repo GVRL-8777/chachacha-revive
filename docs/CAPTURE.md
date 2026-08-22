@@ -10,7 +10,7 @@
 | `HTTP/SchemaCollector.cs` | **신규.** 관측·스키마 추론·저장·리포트 생성 |
 | `HTTP/HTTPProcessor.cs` | 경로 정규화, 전 요청 관측, 미구현 폴백 응답 |
 | `HTTP/HTTPPath.cs` | 정적 생성자에서 경로 상수 정규화 |
-| `Program.cs` | prefix/capture 디렉터리 인자, 종료 시 flush |
+| `patch/Program.cs` | prefix/capture 디렉터리 인자, 종료 시 flush |
 
 ### 1. 경로 정규화 (버그 수정)
 
