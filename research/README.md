@@ -10,7 +10,7 @@
 
 ---
 
-## 담긴 파일 94개
+## 담긴 파일 96개
 
 | 파일 | 하는 일 |
 |---|---|
@@ -20,6 +20,8 @@
 | `addportraits.py` | 드라이버 9~12번 초상화를 중국판 UI 아틀라스에 추가한다. |
 | `allcars.py` | chacnserver.py 의 차량 목록을 '전 차량 보유' 로 바꾼다. |
 | `apkcmp.py` | 여러 APK 의 Unity 버전 / 번들 유무 / 로컬 Resources 경로를 비교한다. |
+| `atlascrop.py` | 아틀라스에서 조각을 하나하나 PNG 로 잘라 낸다. |
+| `atlasdump.py` | APK 나 작업 트리 안의 NGUI 아틀라스를 통째로 뜯어 표로 적는다. |
 | `atlasparse.py` | NGUI UIAtlas(MonoBehaviour)의 스프라이트 목록을 원시 바이트에서 해석한다. |
 | `axml.py` | AXML(이진 AndroidManifest.xml)을 사람이 읽을 수 있게 푼다. |
 | `bestex.py` | 여러 APK 에서 같은 이름의 Texture2D 중 가장 큰 것을 골라 tex8/ 에 PNG 로 뽑는다. |
