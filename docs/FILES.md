@@ -1,6 +1,6 @@
 # 파일 하나하나가 하는 일
 
-저장소에 든 274개 파일의 한 줄 요약입니다. 같은 설명이 각 파일 첫머리에도
+저장소에 든 275개 파일의 한 줄 요약입니다. 같은 설명이 각 파일 첫머리에도
 주석으로 붙어 있고, 이 문서는 거기서 긁어 만듭니다 (`python tools/mkfiles.py`).
 
 ---
@@ -397,6 +397,7 @@ C# 소스. Cecil 패처와, APK 안에 들어가는 코드입니다.
 | [`CAPTURE.md`](CAPTURE.md) | 요청 스키마 수집기 (Schema Collector) |
 | [`DORMANT.md`](DORMANT.md) | 묻어 둔 기능들 |
 | [`FILES.md`](FILES.md) | 이 문서. 파일 하나하나가 하는 일. |
+| [`GPU.md`](GPU.md) | 어떤 폰에서는 3D 가 안 나온다 (Mali · 안드로이드 16) |
 | [`LOCALAPK.md`](LOCALAPK.md) | 서버 없는 로컬 전용 APK — 완성 (2026-08-21) |
 | [`NEWCAR.md`](NEWCAR.md) | 새 차 추가 — 덮어쓰지 않고 한 대를 늘립니다 |
 | [`PRESETS.md`](PRESETS.md) | 판 가르기 — 이제 **세이브 파일**입니다 |
