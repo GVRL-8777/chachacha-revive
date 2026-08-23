@@ -79,6 +79,8 @@ def parse(path):
         out['types'].append((cid, tree))
     out['big_id'] = r.i32()
     oc = r.i32()
+    out['obj_table_at'] = r.p      # 오브젝트 표가 시작하는 자리 (고쳐 쓸 때 쓴다)
+    out['obj_entry_size'] = 20
     objs = []
     for _ in range(oc):
         pid = r.i32()
