@@ -130,6 +130,10 @@ def swap(tree, solid=False):
     o, t = target
     mark = {'red': 'vec4(1.0, 0.0, 0.0, 1.0); //',
             'uv': 'vec4(xlv_TEXCOORD0.x, xlv_TEXCOORD0.y, 0.0, 1.0); //',
+            # 표본을 32배로 키운다. 묶여 있는데 어두운 것인지,
+            # 아예 안 묶여 0 인지 가르는 시험이다.
+            'amp': ('vec4(clamp(texture2D (_MainTex, xlv_TEXCOORD0).xyz'
+                    ' * 32.0, 0.0, 1.0), 1.0); //'),
             '': ''}[solid or '']
     src = NEW_SHADER.replace('SOLIDMARK ', mark)
     t['m_Script'] = src
@@ -197,8 +201,8 @@ def main():
     ap.add_argument('--tree', default=os.path.join(HERE, 'x77'))
     ap.add_argument('--show', action='store_true')
     ap.add_argument('--restore', action='store_true')
-    ap.add_argument('--solid', choices=('red', 'uv'),
-                    help='시험용 — red: 빨강만, uv: UV 좌표를 색으로')
+    ap.add_argument('--solid', choices=('red', 'uv', 'amp'),
+                    help='시험용 — red: 빨강만, uv: UV 를 색으로, amp: 표본 32배')
     a = ap.parse_args()
     if a.show:
         return show(a.tree)
