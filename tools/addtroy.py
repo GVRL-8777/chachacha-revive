@@ -164,6 +164,27 @@ def read_troy():
     return v, uv, tri, t['m_Skin'], t['m_BindPose']
 
 
+def bone_order(path):
+    """그 파일의 SkinnedMeshRenderer 가 쓰는 **뼈 순서를 이름으로** 돌려준다.
+
+    메시의 `m_Skin` 은 뼈를 **번호**로 가리키고, 그 번호는 렌더러의
+    `m_Bones` 배열 자리를 뜻한다. 그래서 파일마다 순서가 다르면 같은
+    번호가 딴 뼈를 가리킨다."""
+    sf = _sf(path)
+    objs = sf.objects
+    name = {}
+    for pid, o in objs.items():
+        if o.type.name != 'Transform':
+            continue
+        t = o.read_typetree()
+        g = objs.get(t['m_GameObject']['m_PathID'])
+        if g is not None:
+            name[pid] = g.read_typetree().get('m_Name')
+    smr = [o for o in objs.values()
+           if o.type.name == 'SkinnedMeshRenderer'][0]
+    return [name.get(b['m_PathID']) for b in smr.read_typetree()['m_Bones']]
+
+
 def troy_image(fn):
     import UnityPy
     env = UnityPy.load(os.path.join(KR8, fn))
@@ -172,6 +193,48 @@ def troy_image(fn):
 
 
 # ------------------------------------------------------------------ 자산 짓기
+def rebone(skin, bindpose, say=print):
+    """뼈 번호를 **빌려 온 프리팹의 순서로** 바꿔 단다.
+
+    이걸 빠뜨리면 점프할 때 목마 몸통은 길 위에 남고 바퀴만 튀어오른다
+    (실기에서 겪었다). 두 파일의 뼈 순서가 이렇게 다르기 때문이다.
+
+        초기판 Troy 메시 : 0=Bone_body  1=Bone_wheel  2=Bone_shadow
+        피닉스 프리팹    : 0=Bone_shadow 1=Bone_body  2=Bone_wheel
+
+    번호를 그대로 두면 몸통(756정점)이 **그림자 뼈**에, 바퀴가 **몸통 뼈**에
+    묶인다. 서 있을 때는 뼈 사이 간격이 0.1 남짓이라 티가 안 나지만,
+    점프 애니메이션은 뼈마다 크게 다르게 움직여서 그때 갈라진다.
+
+    순서는 박아 두지 않고 두 파일에서 **이름으로** 읽어 맞춘다."""
+    src = bone_order(os.path.join(KR8, KR_MODEL))
+    dst = bone_order(os.path.join(XD, D_PREFAB))
+    if src == dst:
+        say('  뼈 순서가 같습니다 (%s)' % ' · '.join(src))
+        return skin, bindpose
+    if sorted(x for x in src if x) != sorted(x for x in dst if x):
+        raise SystemExit('뼈 이름이 서로 다릅니다:\n  초기판 %s\n  프리팹 %s'
+                         % (src, dst))
+    perm = [dst.index(n) for n in src]          # 초기판 번호 -> 프리팹 번호
+    say('  뼈 번호 옮김: %s'
+        % ' · '.join('%s %d→%d' % (n, i, perm[i]) for i, n in enumerate(src)))
+    out = []
+    for s in skin:
+        d = dict(s)
+        for k in range(4):
+            i = int(d.get('boneIndex[%d]' % k) or 0)
+            # 가중치가 0인 자리는 번호가 0으로 채워져 있을 뿐이라 그대로 둔다
+            if d.get('weight[%d]' % k):
+                d['boneIndex[%d]' % k] = perm[i] if i < len(perm) else i
+            else:
+                d['boneIndex[%d]' % k] = 0
+        out.append(d)
+    bp = [None] * len(dst)
+    for i, m in enumerate(bindpose):
+        bp[perm[i]] = dict(m)
+    return out, bp
+
+
 def build_mesh(v, uv, tri, skin, bindpose):
     """유니티 4.1 의 압축 없는 메시 하나를 만든다.
 
@@ -431,6 +494,7 @@ def build_assets(say):
 
     v, uv, tri, skin, bindpose = read_troy()
     say('메시: 정점 %d · 삼각형 %d · 뼈 %d' % (len(v), len(tri) // 3, len(bindpose)))
+    skin, bindpose = rebone(skin, bindpose, say)
 
     # 외부 파일 목록은 **빌려 온 프리팹 것을 그대로** 쓴다. 스크립트가 든
     # MonoBehaviour 는 타입트리가 없어 그 안의 참조 번호를 우리가 다 알

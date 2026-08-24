@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """드라이버 보이스를 **귀로 들을 수 있게** 파일로 뽑는다.
 
-왜 필요한가. 이 프로젝트는 소리를 들을 수 없다. 어느 목소리가 한국어이고
-어느 것이 영문판인지, 톤이 맞는지는 사람이 들어야 안다. 그래서 지금 APK 에
-실제로 들어가는 클립을 그대로 꺼내 준다.
+왜 필요한가. 이 프로젝트는 소리를 들을 수 없다. 어느 말인지, 톤이 맞는지,
+누구 목소리인지는 사람이 들어야 안다. 그래서 지금 APK 에 실제로 들어가는
+클립을 그대로 꺼내 준다. (이 도구로 뽑아 들어 본 덕에, 카카오판을
+'영문판'으로 적어 둔 오래된 오해가 잡혔다 — `docs/VOICE.md`)
 
 **번들에서 뽑는다.** 트리(Resources)가 아니다. `Generic_Title.__ChaResLoad`
 의 IL 을 보면 `Character VOX/` 로 시작하는 이름만 **번들을 먼저** 보므로,
@@ -45,7 +46,12 @@ MODEL = [
     ('NAYOUBI', '나 연비'), ('PIG', None), ('GYARU', None), ('POLY', None),
     ('AMBER', None), ('ROI', None), ('HELLY', None), ('ANGRY', None),
 ]
-BASE = ('DOKANG', 'SARA', 'BIN', 'NAYOUBI')     # 한국어로 갈아 끼운 넷
+# 어느 판에서 온 소리인가. **둘 다 한국어다** — 귀로 확인했다(2026-08-24).
+# 예전에 카카오판을 '동남아/영문판'으로 적어 두었는데 틀렸다. 차 이름이
+# `Garuda`·`Hummie`·`Magnum` 이라 그렇게 넘겨짚은 것이고, 실제 목소리는
+# 열한 명 전부 한국어다.
+SRC_KR8 = '초기판'
+SRC_OTHER = '카카오판'
 
 # 대표 한 마디 — 짧고 성격이 드러나는 것부터.
 PICK = ('EQUIP', 'CHOICE', 'BOOST', 'END', 'COMBO1')
@@ -125,8 +131,8 @@ def run(out_dir, only_one=False, say=print):
         names = sorted(by.get(tag, []))
         if not names:
             continue
-        is_kr = all(n in kr and kr[n] == data[n] for n in names)
-        mark = '한국어' if is_kr else '영문'
+        from_kr8 = all(n in kr and kr[n] == data[n] for n in names)
+        mark = SRC_KR8 if from_kr8 else SRC_OTHER
         who = label or '(이름 미상)'
         folder = '%02d_%s_%s' % (i + 1, tag, mark)
         d = os.path.join(out_dir, folder)
@@ -156,7 +162,6 @@ def run(out_dir, only_one=False, say=print):
 
 
 def readme(out_dir, lines, only_one):
-    n_kr = sum(1 for _f, _w, m, _a, _b in lines if m == '한국어')
     t = []
     t.append('# 드라이버 보이스 — 들어 보실 것')
     t.append('')
@@ -167,12 +172,14 @@ def readme(out_dir, lines, only_one):
     t.append('')
     t.append('## 지금 상태')
     t.append('')
-    t.append('드라이버 %d명 중 **%d명이 한국어**, 나머지는 영문판입니다.'
-             % (len(lines), n_kr))
-    t.append('한국어인 넷은 한국 초기판(`8.apk`, 2013-01)에서 가져온 것이고,')
-    t.append('나머지는 동남아/영문판에서 복원해 온 드라이버들이라 그쪽 더빙뿐입니다.')
+    t.append('드라이버 %d명 **전부 한국어**입니다. 폴더 이름에 붙은 것은'
+             % len(lines))
+    t.append('말이 아니라 **어느 판에서 가져왔는가**입니다.')
     t.append('')
-    t.append('| 폴더 | 게임 안 이름 | 말 | 뽑은 개수 |')
+    t.append('- `초기판` — 한국 초기판 `8.apk` (2013-01). 기본 드라이버 넷.')
+    t.append('- `카카오판` — 카카오 배포판. 복원해 온 일곱 명.')
+    t.append('')
+    t.append('| 폴더 | 게임 안 이름 | 출처 | 뽑은 개수 |')
     t.append('|---|---|---|---|')
     for f, w, m, a, b in lines:
         t.append('| `%s` | %s | %s | %d / %d |' % (f, w, m, a, b))
@@ -196,8 +203,8 @@ def readme(out_dir, lines, only_one):
     t.append('## 마음에 안 드시면')
     t.append('')
     t.append('```')
-    t.append('python tools/voicefix.py        11명을 영문판으로 통일')
-    t.append('python tools/voicefix.py --kr   기본 4명을 한국어로 (지금 상태)')
+    t.append('python tools/voicefix.py        11명을 카카오판 녹음으로 통일')
+    t.append('python tools/voicefix.py --kr   기본 4명을 초기판 녹음으로 (지금)')
     t.append('python tools/voicefix.py --cn   중국판 원본(중국어)으로')
     t.append('```')
     if only_one:
