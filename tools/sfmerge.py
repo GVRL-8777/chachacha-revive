@@ -34,7 +34,13 @@ def walk_pptr(node, fn):
     return n
 
 
-def merge(out_path, bundle_name, specs):
+def merge(out_path, bundle_name, specs, nomanifest=False):
+    """nomanifest 를 주면 매니페스트(pathID 1)를 만들지 않는다.
+
+    `packadd` 로 **이미 구운 번들에 덧붙일** 때 쓴다. 그 번들엔 매니페스트가
+    이미 있으므로 여기서 또 만들면 AssetBundle 오브젝트가 둘이 되어
+    엔진과 `packadd` 가 어느 쪽을 볼지 알 수 없게 된다.
+    (이름, pathID) 목록을 돌려주므로 그대로 `packadd` 스펙에 쓸 수 있다."""
     srcs = []
     flattened = 0
     ext_order = []          # 합친 외부 파일 목록 (이름 순서가 곧 fileID-1)
@@ -53,12 +59,12 @@ def merge(out_path, bundle_name, specs):
         mbptrs = []
         for o in parts[4:]:
             if o.startswith('mbptr='):
-                pid3, _, off3 = o[6:].partition('@')
+                pid3, _, off3 = o[6:].rpartition('@')
                 mbptrs.append((int(pid3), int(off3)))
         extra = []
         for o in parts[4:]:
             if o.startswith('also='):
-                nm2, _, pid2 = o[5:].partition('@')
+                nm2, _, pid2 = o[5:].rpartition('@')
                 extra.append((nm2, int(pid2)))
         meta = parse(path)
         sf = SerializedFile(EndianBinaryReader(io.open(path, 'rb').read()), None)
@@ -152,9 +158,15 @@ def merge(out_path, bundle_name, specs):
                 for mpid, moff in s['mbptrs']:
                     if mpid != pid:
                         continue
+                    # 타입트리 있는 오브젝트와 **같은 규칙**으로 옮긴다.
+                    # 안쪽이면 새 번호로, 합치는 다른 파일을 가리키면 안쪽으로
+                    # 끌어들이고, 바깥이면 새 외부 목록 자리로 옮긴다.
                     f2, p2 = struct.unpack_from('<ii', data, st0 + moff)
-                    if f2 == 0 and p2 in pmap:
-                        struct.pack_into('<ii', data, st0 + moff, 0, pmap[p2])
+                    if f2 or p2:
+                        q = {'m_FileID': f2, 'm_PathID': p2}
+                        fix(q)
+                        struct.pack_into('<ii', data, st0 + moff,
+                                         q['m_FileID'], q['m_PathID'])
                 objs.append({'path_id': pmap[pid], 'start': st0, 'size': rec['size'],
                              'type_id': int(o.class_id), 'class_id': int(o.class_id),
                              'destroyed': 0})
@@ -194,14 +206,15 @@ def merge(out_path, bundle_name, specs):
         entries.append((s['name'], s['map'][s['mainpid']]))
         for nm2, pid2 in s.get('extra', []):
             entries.append((nm2, s['map'][pid2]))
-    manifest = make_manifest(bundle_name, entries,
-                             (0, srcs[0]['map'][srcs[0]['mainpid']]))
-    while len(data) % 8:
-        data.append(0)
-    man_start = len(data)
-    data += manifest
-    objs.insert(0, {'path_id': 1, 'start': man_start, 'size': len(manifest),
-                    'type_id': 142, 'class_id': 142, 'destroyed': 0})
+    if not nomanifest:
+        manifest = make_manifest(bundle_name, entries,
+                                 (0, srcs[0]['map'][srcs[0]['mainpid']]))
+        while len(data) % 8:
+            data.append(0)
+        man_start = len(data)
+        data += manifest
+        objs.insert(0, {'path_id': 1, 'start': man_start, 'size': len(manifest),
+                        'type_id': 142, 'class_id': 142, 'destroyed': 0})
 
     m0 = srcs[0]['meta']
     meta = m0['unity'].encode('utf-8') + b'\x00'
@@ -233,10 +246,13 @@ def merge(out_path, bundle_name, specs):
     print("생성: %s (%d B) | 오브젝트 %d개 | 외부 %d개 | PPtr %d개 재배선"
           % (out_path, len(out), len(objs), len(ext_order), total_ptr))
 
+    if nomanifest:
+        return entries
     sf2 = SerializedFile(EndianBinaryReader(io.open(out_path, 'rb').read()), None)
     ab = [o for p, o in sf2.objects.items() if o.type.name == 'AssetBundle'][0].read_typetree()
     print("  매니페스트 항목: %s"
           % [(c[0], c[1]['asset']['m_PathID']) for c in ab['m_Container']])
+    return entries
 
 
 if __name__ == '__main__':

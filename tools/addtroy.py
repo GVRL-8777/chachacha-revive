@@ -102,9 +102,16 @@ D_LAND = '0dc2540d2d75a465b855ebe6f842cdd5'        # AudioClip:jump landing
 D_EFFECT = 'b03891a19a8514111a11ab126df0853f'      # Phoenix_Effect (미등 · 충돌상자)
 SHADER = '0000000000000000f000000000000000'        # 재질이 가리키는 셰이더 파일
 
+# 번들 덧붙이기 차례에서 이 도구의 자리 (`tools/bundlechain.py`). **맨 뒤**다.
+STAGE = 'bundletroy'
+
 NAME = 'Troy'
 LABEL = '트로이'
-CAR_INDEX = 18                    # 서버 carNo 19. 비어 있는 자리다.
+# 18 번은 **로이**의 자리다. 처음에는 비어 있어 거기 넣었는데,
+# `addcars5.py` 로 정식 차 표(37대)를 들여오면서 제 임자가 돌아왔다.
+# 그래서 표 뒤의 빈 번호로 옮긴다. 트로이는 어차피 원판에 수치가 없는
+# '만들다 만 차'라 번호에 매인 것이 없다.
+CAR_INDEX = 37                    # 서버 carNo 38. 표 뒤의 빈 자리다.
 KLASSES = ('C', 'B', 'A', 'S', 'R')
 ICON_ATLAS = 'Atlas_SpecialCarIcon'
 
@@ -794,11 +801,9 @@ def remove(say=print):
         keep = [x for x in lines if 'car/%s/' % NAME.lower() not in x]
         if len(keep) != len(lines):
             io.open(SPEC, 'w', encoding='utf-8').write('\n'.join(keep) + '\n')
-    for p in (PACKDAT, BUNDLE):
-        b = os.path.join(BAKDIR, os.path.basename(p))
-        if os.path.exists(b):
-            shutil.copy2(b, p)
-            say('%s 를 되돌렸습니다' % os.path.basename(p))
+    import bundlechain
+    bundlechain.start(STAGE, say)
+    bundlechain.done(STAGE, say)
     if os.path.exists(NEWCARS):
         cars = [c for c in json.load(io.open(NEWCARS, encoding='utf-8'))
                 if c['name'] != NAME]
@@ -851,34 +856,17 @@ def scan(say=print):
     return 0
 
 
-def bundle_baseline(say):
-    """번들을 손대기 전 모습으로 되돌린다 (없으면 지금 것을 남겨 둔다).
-
-    `packadd` 는 있는 번들에 **덧붙이는** 도구라 두 번 돌리면 두 번 붙는다.
-    붙이기 전에 늘 원래 자리로 돌려놓아 몇 번을 돌려도 같게 만든다.
-    번들을 처음부터 다시 굽는 길은 없다 — `packadd` 의 설명을 보라."""
-    os.makedirs(BAKDIR, exist_ok=True)
-    fresh = True
-    for p in (PACKDAT, BUNDLE):
-        b = os.path.join(BAKDIR, os.path.basename(p))
-        if os.path.exists(b):
-            shutil.copy2(b, p)
-            fresh = False
-        elif os.path.exists(p):
-            shutil.copy2(p, b)
-    say('번들 원본을 %s' % ('backup/bundle 에 남겼습니다' if fresh
-                        else 'backup/bundle 에서 되살렸습니다'))
-
-
 def add(say=print):
     roots, mats, mbptr, lock, fx = build_assets(say)
     line = spec_line(roots, mats, mbptr, lock, fx)
     add_spec(line, say)
-    bundle_baseline(say)
+    import bundlechain
+    bundlechain.start(STAGE, say)
     import packadd
     say('번들에 얹습니다…')
     packadd.add(OUT, [line.split(':', 1)[1]], say)
     packadd.wrap(say)
+    bundlechain.done(STAGE, say)
     register_cardb(say)
     register_label(say)
     register_tables(say)

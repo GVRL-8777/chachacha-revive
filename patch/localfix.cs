@@ -25,7 +25,7 @@ using Mono.Cecil.Cil;
 class LocalFix
 {
     static ModuleDefinition mod;
-    static int nText, nErr, nDec, nWWW, nBundle, nPower;
+    static int nText, nErr, nDec, nWWW, nBundle;
 
     static IEnumerable<TypeDefinition> All(TypeDefinition t)
     {
@@ -158,7 +158,7 @@ class LocalFix
         var mBundle = Ref(local, "BundleWWW");
         var mIsLocal = Ref(local, "IsLocal");
         // 갈림길은 원래 부르던 것을 만난 자리에서 만든다(그때야 서명을 안다)
-        MethodReference fDec = null, fPower = null;
+        MethodReference fDec = null;
 
         var types = mod.Types.SelectMany(x => All(x)).ToList();
 
@@ -225,30 +225,12 @@ class LocalFix
             }
         }
 
-        // ---- 1-3) 캐릭터를 골드로도 살 수 있게 -------------------------
-        // DriverUnit::OnBuyDriver 가 `myTrophy < 카드값` 이면 트로피 상점으로
-        // 보냅니다. 그 한 번의 읽기만 ChaLocal.BuyPower 로 바꿔 골드를 얹습니다.
-        // (스택 모양도 반환형도 같아 연산자만 바꾸는 안전한 패치입니다)
-        var du = types.FirstOrDefault(t2 => t2.FullName == "DriverUnit");
-        if (du != null)
-        {
-            var mPower = Ref(local, "BuyPower");
-            var ob = du.Methods.FirstOrDefault(m2 => m2.Name == "OnBuyDriver");
-            if (ob != null && ob.HasBody)
-            {
-                foreach (var ins in ob.Body.Instructions)
-                {
-                    var mr = ins.Operand as MethodReference;
-                    if (mr == null || mr.Name != "get_myTrophy") continue;
-                    if (fPower == null)
-                        fPower = Fork("__ChaPower", mr, mPower, mIsLocal);
-                    ins.OpCode = OpCodes.Call;
-                    ins.Operand = fPower;
-                    nPower++;
-                }
-                Console.WriteLine("캐릭터 구매 판정 " + nPower + "곳 -> 골드도 함께 셈");
-            }
-        }
+        // ---- 1-3) 캐릭터 구매 판정은 **건드리지 않는다** ---------------
+        // 예전에는 `DriverUnit::OnBuyDriver` 의 `myTrophy < 카드값` 읽기를
+        // `ChaLocal.BuyPower`(트로피 + 골드환산)로 바꿔 골드로도 살 수 있게
+        // 했습니다. 그런데 그러면 트로피가 모자라도 카드가 그냥 사지는 것처럼
+        // 보입니다. 게임 자신의 판정을 그대로 두면 트로피가 모자랄 때
+        // **트로피 상점으로 보내 줍니다** — 그게 원래 모습입니다.
 
         // ---- 2) www.text · www.error · Aes.Decrypt · 번들 주소 ---------
         foreach (var t in types)

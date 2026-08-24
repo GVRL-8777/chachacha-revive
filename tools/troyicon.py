@@ -37,6 +37,7 @@ import uiatlas                                                  # noqa: E402
 
 XD = os.path.join(HERE, 'x77', 'assets', 'bin', 'Data')
 BAK = os.path.join(HERE, 'backup', 'atlas')
+BAK5 = os.path.join(HERE, 'backup', 'atlas5')   # carsicon.py 의 결과
 ASSETS = os.path.join(HERE, 'troy.assets')
 
 ATLAS = 'e319f1a9aae42d44abe80babf4113fcf'      # UIAtlas(MonoBehaviour) pathID 3
@@ -281,11 +282,13 @@ def scan(say=print):
     o = [x for x in env.objects if x.type.name == 'Texture2D'][0]
     tt = o.read_typetree()
     a = np.array(o.read().image)
-    x0, y0, x1, y1 = FREE
-    empty = bool((a[y0:y1, x0:x1, 3] == 0).all())
-    say('텍스처 %dx%d fmt=%d — 오른쪽 위 (%d,%d)-(%d,%d) %s'
+    # 트로이가 쓸 네모만 본다. 빈 네모의 나머지는 `carsicon.py` 가
+    # 아크엔젤·W3·블리츠 아이콘으로 채우므로 비어 있지 않은 게 정상이다.
+    x0, y0 = free_spot(*BOX)
+    empty = bool((a[y0:y0 + BOX[1], x0:x0 + BOX[0], 3] == 0).all())
+    say('텍스처 %dx%d fmt=%d — 트로이 자리 (%d,%d) %dx%d %s'
         % (tt['m_Width'], tt['m_Height'], tt['m_TextureFormat'],
-           x0, y0, x1, y1, '비어 있음' if empty else '**뭔가 있음**'))
+           x0, y0, BOX[0], BOX[1], '비어 있음' if empty else '**뭔가 있음**'))
     return 0
 
 
@@ -301,12 +304,14 @@ def install(say=print):
     if not os.path.exists(ASSETS):
         raise SystemExit('troy.assets 가 없습니다. 먼저 addtroy.py 를 돌리세요.')
     os.makedirs(BAK, exist_ok=True)
+    # 밑바탕. `carsicon.py` 가 먼저 돌아 아크엔젤·W3·블리츠 아이콘을 넣어
+    # 두었으면 그 결과에서 이어 간다. 아니면 손대기 전 원본에서 시작한다.
+    base = BAK5 if os.path.isdir(BAK5) else BAK
     for fn in (ATLAS, TEXTURE):
         b = os.path.join(BAK, fn)
-        if os.path.exists(b):
-            shutil.copy2(b, os.path.join(XD, fn))     # 늘 같은 자리에서 시작
-        else:
+        if not os.path.exists(b):
             shutil.copy2(os.path.join(XD, fn), b)
+        shutil.copy2(os.path.join(base, fn), os.path.join(XD, fn))
 
     im = icon()
     x, y = free_spot(*BOX)

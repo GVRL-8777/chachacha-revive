@@ -51,10 +51,10 @@ def parse_spec(args):
             if o == 'keepscript':
                 keepscript = True
             elif o.startswith('also='):
-                nm, _, pid = o[5:].partition('@')
+                nm, _, pid = o[5:].rpartition('@')
                 names.append((nm, int(pid)))
             elif o.startswith('mbptr='):
-                pid, _, off = o[6:].partition('@')
+                pid, _, off = o[6:].rpartition('@')
                 mbptr.append((int(pid), int(off)))
     return names, mbptr, keepscript
 
@@ -124,9 +124,13 @@ def add(src, specs, say=print):
             for mpid, moff in mbptr:
                 if mpid != pid:
                     continue
+                # 타입트리 있는 오브젝트와 **같은 규칙**으로 옮긴다.
                 f2, p2 = struct.unpack_from('<ii', data, at + moff)
-                if f2 == 0 and p2 in pmap:
-                    struct.pack_into('<ii', data, at + moff, 0, pmap[p2])
+                if f2 or p2:
+                    q = {'m_FileID': f2, 'm_PathID': p2}
+                    fix(q)
+                    struct.pack_into('<ii', data, at + moff,
+                                     q['m_FileID'], q['m_PathID'])
         else:
             t = o.read_typetree()
             ptrs += walk_pptr(t, fix)

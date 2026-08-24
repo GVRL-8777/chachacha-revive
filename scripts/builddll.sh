@@ -10,6 +10,9 @@
 #     -> modesfix.exe            중국판이 꺼 둔 모드 켜기(CHA_MODES)
 #     -> tradefix.exe            되팔기 팝업의 널 딕셔너리 초기화
 #     -> titlefix.exe            타이틀이 그냥 지나쳐 버리는 것 (CHA_TITLE_FRAMES)
+#     -> pausefix.exe            일시정지로 나가면 로비 BGM 이 죽는 것
+#     -> robotbgm.exe            로보카 차로 달리면 BGM 이 안 나오는 것
+#     -> drivercutin.exe         드라이버 9~12 의 컷인이 전부 나정비로 나오는 것
 #     -> x77/.../Managed/
 #
 # 로컬 전용(서버 없는) 빌드는 여기서 나온 ACCN.dll 을 한 번 더 손본다.
@@ -29,7 +32,9 @@ set -e
 ./modesfix.exe ACtmp5.dll ACtmp6.dll "${CHA_MODES:-hurdle,tradecar}" | tail -3
 ./tradefix.exe ACtmp6.dll ACtmp7.dll | tail -2
 ./titlefix.exe ACtmp7.dll ACtmp8.dll "${CHA_TITLE_FRAMES:-180}" | tail -3
- ./pausefix.exe ACtmp8.dll ACCN.dll mgbase | tail -3
-rm -f ACtmp.dll ACtmp2.dll ACtmp3.dll ACtmp4.dll ACtmp5.dll ACtmp7.dll ACtmp8.dll
+./pausefix.exe ACtmp8.dll ACtmp9.dll mgbase | tail -3
+./robotbgm.exe ACtmp9.dll ACtmp10.dll mgbase | tail -3
+./drivercutin.exe ACtmp10.dll ACCN.dll mgbase | tail -6
+rm -f ACtmp.dll ACtmp2.dll ACtmp3.dll ACtmp4.dll ACtmp5.dll ACtmp7.dll ACtmp8.dll ACtmp9.dll ACtmp10.dll
 cp ACCN.dll x77/assets/bin/Data/Managed/Assembly-CSharp.dll
 echo "x77 에 반영 완료"

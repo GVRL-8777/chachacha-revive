@@ -23,6 +23,7 @@ CODE = os.path.dirname(os.path.abspath(__file__))
 SP = os.path.dirname(CODE)
 LOG = os.path.join(SP, "servercn.log")
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8888
+
 lock = threading.Lock()
 CR = chr(13) + chr(10)
 
@@ -121,14 +122,14 @@ DRIVERS_OWNED = set(range(1, 13))
 # CarDataBase(editor_/database/cardatabase) 의 CarIndex + 1 과 시작 등급.
 #  1 AVEO C / 2 PRIUS B / ... / 21 Lamborghini S / 33 Unicorn S / 34 Meteor A
 # 35~38(Archangel W3 Blitz Pluto)은 중국판에 모델이 아예 없어 뺀다.
-CAR_CLASS = {1: "C", 2: "B", 3: "B", 4: "B", 5: "B", 6: "B", 7: "A", 8: "A", 9: "A", 10: "C", 11: "B", 12: "B", 13: "A", 14: "B", 15: "A", 16: "A", 17: "A", 18: "A", 21: "S", 23: "S", 25: "S", 26: "C", 27: "C", 28: "C", 29: "B", 30: "C", 31: "C", 32: "C", 33: "S", 34: "A", 19: "C"}
+CAR_CLASS = {1: "C", 2: "B", 3: "B", 4: "B", 5: "B", 6: "B", 7: "A", 8: "A", 9: "A", 10: "C", 11: "B", 12: "B", 13: "A", 14: "B", 15: "A", 16: "A", 17: "A", 18: "A", 21: "S", 23: "S", 25: "S", 26: "C", 27: "C", 28: "C", 29: "B", 30: "C", 31: "C", 32: "C", 33: "S", 34: "A", 20: "A", 24: "B", 35: "S", 36: "S", 37: "S", 22: "A", 19: "A", 38: "C"}
 
 # 값 = (골드값, 트로피값). 프리미엄 차는 트로피로 산다.
-CAR_COST = {1: (0, 0), 2: (5000, 14), 3: (5000, 14), 4: (5000, 14), 5: (5000, 14), 6: (5000, 14), 7: (20000, 50), 8: (20000, 50), 9: (20000, 50), 10: (0, 10), 11: (0, 14), 12: (0, 14), 13: (20000, 50), 14: (5000, 14), 15: (20000, 50), 16: (20000, 50), 17: (20000, 50), 18: (0, 0), 21: (0, 120), 23: (0, 120), 25: (0, 120), 26: (0, 15), 27: (0, 15), 28: (0, 15), 29: (5000, 14), 30: (0, 15), 31: (0, 15), 32: (0, 15), 33: (0, 120), 34: (25000, 60), 19: (0, 15)}
+CAR_COST = {1: (0, 0), 2: (5000, 14), 3: (5000, 14), 4: (5000, 14), 5: (5000, 14), 6: (5000, 14), 7: (20000, 50), 8: (20000, 50), 9: (20000, 50), 10: (0, 10), 11: (0, 14), 12: (0, 14), 13: (20000, 50), 14: (5000, 14), 15: (20000, 50), 16: (20000, 50), 17: (20000, 50), 18: (0, 60), 21: (0, 120), 23: (0, 120), 25: (0, 120), 26: (0, 15), 27: (0, 15), 28: (0, 15), 29: (5000, 14), 30: (0, 15), 31: (0, 15), 32: (0, 15), 33: (0, 120), 34: (25000, 60), 20: (0, 60), 24: (0, 0), 35: (0, 120), 36: (0, 120), 37: (0, 120), 22: (0, 60), 19: (0, 60), 38: (0, 15)}
 
 # 자동차 샵에 남겨 둘 차. 전부 갖고 있으면 미보유 목록이 비어
 # 자동차 샵 탭이 그냥 되돌아와 먹통처럼 보인다.
-SHOP_CARS = {33, 34, 21, 23, 25, 19}
+SHOP_CARS = {33, 34, 21, 23, 25, 18, 20, 24, 35, 36, 37, 22, 19, 38}
 
 OWNED_CARS = set(CAR_CLASS) - SHOP_CARS
 
@@ -573,8 +574,15 @@ def _getcar(req, path):
         if no in OWNED_CARS:
             log("         *** 차 구매: %d번 (골드 %d / 트로피 %d, 보유 %d대)"
                 % (no, gold, trophy, len(OWNED_CARS)))
+        else:
+            log("         *** 차 구매 거절: %d번 (골드 %d < %d · 트로피 %d < %d)"
+                % (no, PLAYER["gold"], gold, PLAYER["trophyCnt"], trophy))
     b = auto(path)
     b["missions"] = []
+    # 캐릭터 쪽과 같은 까닭으로, 못 산 것은 실패로 돌려준다.
+    if no in CAR_CLASS and no not in OWNED_CARS:
+        b["success"] = False
+        b["errorCode"] = ERR_GOLD if by_gold else ERR_TROPHY
     for k in ("remainGoldAmt", "goldAmt", "gold"):
         b[k] = PLAYER["gold"]
     for k in ("remainTrophyCnt", "trophyCnt"):
@@ -638,17 +646,38 @@ def ep_presentrecv(req):
 # rankfix.exe 로 넣은 마무리 블록이 userId 를 이름으로 쓰고,
 # "__me__" 표식이면 내 줄로 잡는다.
 # gameMode 001=주행 002=허들. carNo 와 ladderClassNo 는 1부터 센다.
+# \ud55c\uad6d \ucd08\uae30\ud310(1.2.3)\uc758 **\ub370\ubaa8 \uc21c\uc704\ud45c\ub97c \uadf8\ub300\ub85c** \uc62e\uaca8 \ub193\uc740 \uac83\uc774\ub2e4.
+#
+# \uadf8 \ud310\uc758 `LOBBY_ATLAS` \uc5d0\ub294 \ub85c\ube44 \ud654\uba74\uc774 \ud1b5\uc9f8\ub85c **\uadf8\ub9bc\uc73c\ub85c** \uadf8\ub824\uc838 \uc788\uace0,
+# \uc8fc\uac04\uc21c\uc704 \uce78\uc5d0 \uac1c\ubc1c \ub2f9\uc2dc \uc4f0\ub358 \uc774\ub984\uacfc \uae30\ub85d\uc774 \ubc15\ud600 \uc788\ub2e4(\ubb38\uc790\uc5f4\uc774 \uc544\ub2c8\ub77c
+# \ud53d\uc140\uc774\ub77c \ubb38\uc790\uc5f4 \uac80\uc0c9\uc73c\ub85c\ub294 \uc548 \uc7a1\ud78c\ub2e4).
+#
+#     1 \ud55c\uc9c0\uc724 25345M   2 \uae40\ud638\uadfc 1345M   3 \ud558\ud765\ud76c 1145M
+#     4 \uc2e0\uc6a9\uc11d   945M   5 \ucc28\uc694\ud55c  745M
+#
+# 1\ub4f1\ub9cc \ub69d \ub5a8\uc5b4\uc838 \uc788\uace0 2~5\ub4f1\uc774 200\uc529 \uace0\ub974\uac8c \ub0b4\ub824\uac00\ub294, \uc190\uc73c\ub85c \ub9cc\ub4e0 \uc790\ub8cc\ub2e4.
+# \ub2e8\uc704\ub294 \uadf8\ub54c **\uac70\ub9ac(M)** \uc600\uace0 \uc9c0\uae08 \ube4c\ub4dc\ub294 **\uc810\uc218**\ub85c \uc904\uc744 \uc138\uc6b0\ubbc0\ub85c \uc22b\uc790\ub9cc
+# \uadf8\ub300\ub85c \uac00\uc838\ub2e4 \uc4f4\ub2e4. \ud55c \ud310\uc774 1~2\ub9cc \uc810\uc774\ub77c 2~5\ub4f1\uc740 \uace7 \uc81c\uce58\uace0 1\ub4f1\uc744 \ucad3\uac8c
+# \ub41c\ub2e4 \u2014 \uc8fc\ud589 \uc911 \uc624\ub978\ucabd \uc704 '\ub2e4\uc74c\ubaa9\ud45c'\uac00 \uadf8\ub9cc\ud07c \uc0b4\uc544\ub09c\ub2e4.
+#
+# \ucc28 \ubc88\ud638\ub294 \uadf8\ub9bc \uc18d \ucc28\uc640 \uacb0\uc744 \ub9de\ucd98 \uac83\uc774\ub2e4(\ud770 \uacbd\ucc30\ucc28\ud48d \u00b7 \uac80\uc815 \uc2a4\ud3ec\uce20 \u00b7 \uc2b9\ud569).
+# \ub2e4\uc12f\uc9f8 \uce78\uc740 \ud504\ub85c\ud544 \uc0ac\uc9c4 \ubc88\ud638\ub2e4. \uadf8 \uadf8\ub9bc\ub3c4 \uac19\uc740 \ud654\uba74\uc5d0\uc11c \uc624\ub824 \uc654\ub2e4
+# (`tools/rankphoto.py` \u2192 `x77/assets/rank/<n>.png`).
 RIVALS = [
-    ("\uc9c8\uc8fc\ubcf8\ub2a5", 1200000, 9, "S"),
-    ("\ub2c8\ud2b8\ub85c\ubd80\uc2a4\ud130", 940000, 8, "A"),
-    ("\ub3c4\ub85c\uc704\uc758\ub2ec\ub9bc", 610000, 7, "A"),
-    ("\ucd08\ubcf4\ub4dc\ub77c\uc774\ubc84", 250000, 2, "B"),
-    ("\uac70\ubd81\uc774\ud0dd\ubc30", 80000, 1, "C"),
+    ("\ud55c\uc9c0\uc724", 25345, 18, "A", 1),
+    ("\uae40\ud638\uadfc", 1345, 7, "A", 2),
+    ("\ud558\ud765\ud76c", 1145, 8, "A", 3),
+    ("\uc2e0\uc6a9\uc11d", 945, 12, "B", 4),
+    ("\ucc28\uc694\ud55c", 745, 14, "B", 5),
 ]
 
 
-def _rankrow(uid, seq, score, carno, carcls, mode):
-    return {"userId": uid, "gameMode": mode, "accountSeq": seq,
+def _rankrow(uid, seq, score, carno, carcls, mode, photo=0):
+    # 프로필 사진은 **응답으로 못 준다.** `CRSystem::SetDefaultRankData` 가
+    # `imageUrl` 을 소셜 친구 정보에서만 채우고 우리 JSON 은 안 본다(실측).
+    # 그래서 `localfix` 가 그 끝에 갈고리를 달아 이름으로 채워 준다.
+    return {"userId": uid,
+            "gameMode": mode, "accountSeq": seq,
             "score": int(score), "carNo": carno, "carClass": carcls,
             "canPresent": False, "sentPresent": False,
             "boastReject": False, "carX": 0, "carY": 0,
@@ -661,8 +690,8 @@ def _ranklist(mode_scores):
     for mode, my in mode_scores:
         rows.append(_rankrow("__me__", 1, my, PLAYER["carNo"],
                              CAR_CLASS.get(PLAYER["carNo"], "C"), mode))
-        for i, (nm, sc, cn, cl) in enumerate(RIVALS):
-            rows.append(_rankrow(nm, 100 + i, sc, cn, cl, mode))
+        for i, (nm, sc, cn, cl, ph) in enumerate(RIVALS):
+            rows.append(_rankrow(nm, 100 + i, sc, cn, cl, mode, ph))
     return rows
 
 
@@ -1107,32 +1136,50 @@ def ep_useitem(req):
 #   1 도 강현  = 기본 드라이버(무료)
 #   2 Sarah Cha 60 · 3 빈 경유 40 · 4 나 연비 50
 #   5~12       120  (슬롯을 늘리며 붙인 자리까지 같은 값)
-# 골드로도 살 수 있게 하되 환율은 게임 자체의 골드 교환표를 따른다
-# (5 트로피 = 2,500 골드 → 트로피 1 = 500 골드).
+# 캐릭터는 **트로피로만** 산다. 예전에는 트로피가 모자라면 골드로 받아
+# 주었는데, 값을 못 치르고도 사지는 것처럼 보여 걷어냈다.
 DRIVER_COST = {1: 0, 2: 60, 3: 40, 4: 50}
 DRIVER_COST_DEFAULT = 120
-DRIVER_GOLD_PER_TROPHY = 500
+
+# 값이 모자랄 때 돌려줄 오류 코드. 클라이언트는 이 문자열을 **그대로 문구
+# 열쇠로 삼아** 팝업을 띄운다(`DriverUnit::RequestBuyCharacter` 실기 IL).
+# 문자열표에 정품 서버가 쓰던 코드가 그대로 남아 있어 그걸 쓴다.
+#   SVC_3003 = 보유하신 트로피가 부족합니다. 트로피는 상점에서 구입이 가능합니다^^
+#   SVC_5002 = 보유하신 골드가 부족합니다. …상점에서 구입이 가능합니다^^
+ERR_TROPHY = "SVC_3003"
+ERR_GOLD = "SVC_5002"
 
 
 def ep_buycharacter(req):
-    """캐릭터 구매. 트로피가 모자라면 골드로 받는다.
+    """캐릭터 구매. **트로피로만** 받는다.
 
-    응답 클래스에 골드 칸이 없어서 화면의 골드는 다음 새로고침 때 맞는다."""
+    **값을 못 치르면 실패로 돌려줘야 한다.** 예전에는 조용히 안 주고
+    성공을 돌려줬는데, 클라이언트는 그 말을 믿고 카드를 '장착중'으로
+    바꿔 버린다 — 새로고침해야 원래대로 돌아온다. 실기에서 '트로피가
+    모자라도 그냥 사진다'로 보이던 것이 이것이다.
+
+    실패로 돌려주면 클라이언트가 `errorCode` 를 문구 열쇠로 삼아 팝업을
+    띄운다. `SVC_3003` 은 정품 서버가 쓰던 코드라 문자열표에 그대로 있다 —
+    "보유하신 트로피가 부족합니다. 트로피는 상점에서 구입이 가능합니다^^"."""
     no = _pick(req, "characterNo")
     cost = DRIVER_COST.get(no, DRIVER_COST_DEFAULT)
-    gold_price = cost * DRIVER_GOLD_PER_TROPHY
-    if 1 <= no <= DRIVER_COUNT and no not in DRIVERS_OWNED:
-        if PLAYER["trophyCnt"] >= cost:
-            PLAYER["trophyCnt"] -= cost
-            DRIVERS_OWNED.add(no)
-            log("         *** 캐릭터 구매: %d번 (트로피 -%d)" % (no, cost))
-        elif PLAYER["gold"] >= gold_price:
-            PLAYER["gold"] -= gold_price
-            DRIVERS_OWNED.add(no)
-            log("         *** 캐릭터 구매: %d번 (골드 -%d)" % (no, gold_price))
+    ok = False
+    if no in DRIVERS_OWNED:
+        ok = True                                  # 이미 가진 것 — 그냥 성공
+    elif 1 <= no <= DRIVER_COUNT and PLAYER["trophyCnt"] >= cost:
+        PLAYER["trophyCnt"] -= cost
+        DRIVERS_OWNED.add(no)
+        ok = True
+        log("         *** 캐릭터 구매: %d번 (트로피 -%d)" % (no, cost))
+    else:
+        log("         *** 캐릭터 구매 거절: %d번 (트로피 %d < %d)"
+            % (no, PLAYER["trophyCnt"], cost))
     b = auto("/shop/character/buy")
     b["remainTrophyCnt"] = PLAYER["trophyCnt"]
     b["missions"] = []
+    if not ok:
+        b["success"] = False
+        b["errorCode"] = ERR_TROPHY
     return b
 
 

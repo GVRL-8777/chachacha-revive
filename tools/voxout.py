@@ -54,7 +54,11 @@ MODEL = [
     ('POLY', '**차** Poli'), ('AMBER', '**차** Amber'),
     ('ROI', '**차** Roy'), ('HELLY', '**차** helly'),
     ('ANGRY', '앵그리성호 (Char7)'),
-    # 11 ROPE = 정신이(Char8). 우리가 가진 어느 판에도 보이스가 없다.
+    # 여기부터는 5.1.0 에서 옮겨 온 것이다 (`tools/addvox5.py`).
+    ('ROPE', '정신이 (Char8)'),
+    # 아래 둘은 드라이버가 아직 없어 **게임에선 안 울린다.** 소리만 있다.
+    ('NAJUNGBI', '나정비 (Driver_9 · 우리 빌드엔 없음)'),
+    ('AHNBYULE', '안별이 (Driver_10 · 우리 빌드엔 없음)'),
 ]
 # 어느 판에서 온 소리인가. **둘 다 한국어다** — 귀로 확인했다(2026-08-24).
 # 예전에 카카오판을 '동남아/영문판'으로 적어 두었는데 틀렸다. 차 이름이
@@ -62,6 +66,9 @@ MODEL = [
 # 열한 명 전부 한국어다.
 SRC_KR8 = '초기판'
 SRC_OTHER = '카카오판'
+SRC_V5 = '정식5.1.0'
+# 5.1.0 에서만 온 것. 초기판·카카오판 어디에도 없다.
+V5_ONLY = ('ROPE', 'NAJUNGBI', 'AHNBYULE')
 
 # 대표 한 마디 — 짧고 성격이 드러나는 것부터.
 PICK = ('EQUIP', 'CHOICE', 'BOOST', 'END', 'COMBO1')
@@ -141,8 +148,11 @@ def run(out_dir, only_one=False, say=print):
         names = sorted(by.get(tag, []))
         if not names:
             continue
-        from_kr8 = all(n in kr and kr[n] == data[n] for n in names)
-        mark = SRC_KR8 if from_kr8 else SRC_OTHER
+        if tag in V5_ONLY:
+            mark = SRC_V5
+        else:
+            from_kr8 = all(n in kr and kr[n] == data[n] for n in names)
+            mark = SRC_KR8 if from_kr8 else SRC_OTHER
         who = label or '(이름 미상)'
         folder = '%02d_%s_%s' % (i + 1, tag, mark)
         d = os.path.join(out_dir, folder)

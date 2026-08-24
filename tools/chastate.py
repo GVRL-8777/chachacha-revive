@@ -31,11 +31,14 @@ CARS = [
     (7, "GTR", "A"), (8, "Mustang", "A"), (9, "McLaren", "A"),
     (10, "SSANENG", "C"), (11, "CAT", "B"), (12, "block", "B"),
     (13, "Hummer", "A"), (14, "Mini", "B"), (15, "Falcon", "A"),
-    (16, "Choper", "A"), (17, "Ne88", "A"), (18, "helly", "A"),
-    (21, "Lamborghini", "S"), (23, "C7", "S"), (25, "Astonmartin", "S"),
-    (26, "Cyclone", "C"), (27, "Hurricane", "C"), (28, "Phoenix", "C"),
-    (29, "Hardroad", "B"), (30, "Heavysuricar", "C"), (31, "Superemperor", "C"),
-    (32, "Thunder", "C"), (33, "Unicorn", "S"), (34, "Meteor", "A"),
+    (16, "Choper", "A"), (17, "Ne88", "A"), (18, "Poli", "A"),
+    (19, "Roy", "A"), (20, "Amber", "A"), (21, "Lamborghini", "S"),
+    (22, "helly", "A"), (23, "C7", "S"), (24, "Taegeuk", "B"),
+    (25, "Astonmartin", "S"), (26, "Cyclone", "C"), (27, "Hurricane", "C"),
+    (28, "Phoenix", "C"), (29, "Hardroad", "B"), (30, "Heavysuricar", "C"),
+    (31, "Superemperor", "C"), (32, "Thunder", "C"), (33, "Unicorn", "S"),
+    (34, "Meteor", "A"), (35, "Archangel", "S"), (36, "W3", "S"),
+    (37, "Blitz", "S"), (38, "Troy", "C"),
 ]
 # newcar.py 로 새로 넣은 차들. 파일이 있으면 목록에 붙는다.
 def _load_newcars():

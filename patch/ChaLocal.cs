@@ -331,7 +331,6 @@ public static class ChaLocal
     // 골드로도 살 수 있고, 환율은 게임 교환표대로 트로피 1 = 500 골드입니다.
     static readonly int[] DRIVER_COST = { 0, 60, 40, 50 };   // 1~4번
     const int DRIVER_COST_DEFAULT = 120;
-    const int DRIVER_GOLD_PER_TROPHY = 500;
 
     static int DriverCost(int no)
     {
@@ -1456,28 +1455,36 @@ public static class ChaLocal
         return b;
     }
 
-    /// 캐릭터 구매. 트로피가 모자라면 골드로 받습니다.
+    /// 캐릭터 구매. **트로피로만** 받습니다.
+    ///
+    /// 값을 못 치르면 실패로 돌려줍니다. 성공을 돌려주면 클라이언트가 그
+    /// 말을 믿고 카드를 '장착중'으로 바꿔 버립니다. 클라이언트는 실패의
+    /// `errorCode` 를 **그대로 문구 열쇠로 삼아** 팝업을 띄우는데,
+    /// `SVC_3003` 은 정품 서버가 쓰던 코드라 문자열표에 그대로 있습니다 —
+    /// "보유하신 트로피가 부족합니다. 트로피는 상점에서 구입이 가능합니다^^".
     static Hashtable EpBuyCharacter(Hashtable q)
     {
         int no = Pick(q, "characterNo");
         long cost = DriverCost(no);
-        long goldPrice = cost * DRIVER_GOLD_PER_TROPHY;
-        if (no >= 1 && no <= driverCount && !drivers.ContainsKey(no))
+        bool ok = false;
+        if (no >= 1 && no <= driverCount && drivers.ContainsKey(no))
         {
-            if (trophy >= cost)
-            {
-                trophy -= cost;
-                drivers[no] = true;
-            }
-            else if (gold >= goldPrice)
-            {
-                gold -= goldPrice;
-                drivers[no] = true;
-            }
+            ok = true;                       // 이미 가진 것
+        }
+        else if (no >= 1 && no <= driverCount && trophy >= cost)
+        {
+            trophy -= cost;
+            drivers[no] = true;
+            ok = true;
         }
         Hashtable b = Auto("/shop/character/buy");
         b["remainTrophyCnt"] = trophy;
         b["missions"] = new ArrayList();
+        if (!ok)
+        {
+            b["success"] = false;
+            b["errorCode"] = "SVC_3003";
+        }
         return b;
     }
 
@@ -1645,6 +1652,7 @@ public static class ChaLocal
     }
 
     // --- 주간순위 ---------------------------------------------------
+
     static Hashtable RankRow(string uid, long seq, long score, int cno,
                              string ccls, string mode)
     {
@@ -2049,19 +2057,6 @@ public static class ChaLocal
         // streamingAssetsPath 가 `jar:file://…apk!/assets` 라 WWW 로 열린다.
         if (!IsLocal()) return new WWW(url);
         return new WWW(Application.streamingAssetsPath + "/pack.unity3d");
-    }
-
-    /// 캐릭터 구매 판정 자리.
-    ///
-    /// 클라이언트는 `CRSystem.myTrophy < 카드에 적힌 값` 이면 트로피 상점으로
-    /// 보내 버립니다. 골드로도 살 수 있게 하려면 그 판정에 골드를 얹어야
-    /// 합니다. 환율은 게임 자체의 교환표대로 트로피 1 = 500 골드입니다.
-    /// 실제로 깎는 쪽(EpBuyCharacter)은 트로피를 먼저 쓰고 모자라면 골드를
-    /// 씁니다. 그래서 이 값은 "지금 낼 수 있는 트로피 환산액" 입니다.
-    public static long BuyPower(object crSystem)
-    {
-        Boot();
-        return trophy + gold / DRIVER_GOLD_PER_TROPHY;
     }
 
     /// Aes.Decrypt 자리. 로컬판의 답은 처음부터 평문이다.

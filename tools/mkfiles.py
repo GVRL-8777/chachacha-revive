@@ -35,6 +35,7 @@ GROUPS = {
             mkpack.py packadd.py mapspec.py dump_systemtext.py"""),
         ('차 · 드라이버 · 자산', """chaassets.py chaanim.py chaanimglb.py newcar.py
             mktaegeuk.py carmesh.py addtaegeuk.py addhelly.py addtroy.py troyicon.py
+            addcars5.py carsicon.py addvox5.py bundlechain.py
             cardb.py carprice.py trimcars.py chadrv.py drvprice.py drvfont.py
             chaskill.py voicefix.py voxout.py titlevoice.py"""),
         ('한글화', """mkkorean.py krmerge.py krtext.py krtitle.py korean_res.py

@@ -396,11 +396,18 @@ CSC = _find_csc()
 
 
 def _newer(a, b):
-    """a 가 b 보다 새것인가(또는 b 가 없는가)."""
+    """a 를 b 로 다시 베껴야 하는가(또는 b 가 없는가).
+
+    시각만 보면 **되돌린 파일을 놓친다.** `shutil.copy2` 는 원본 시각을
+    그대로 물려주므로, 예전 번들을 backup 에서 되살리면 그 시각이 이미
+    담아 둔 것보다 옛것이 되어 다시 안 베낀다 — 낡은 번들이 그대로 APK 에
+    들어간다(실기에서 겪었다). 크기가 다르면 시각과 무관하게 베낀다."""
     if not os.path.exists(b):
         return True
     if not os.path.exists(a):
         return False
+    if os.path.getsize(a) != os.path.getsize(b):
+        return True
     return os.path.getmtime(a) > os.path.getmtime(b)
 
 
