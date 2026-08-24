@@ -28,7 +28,8 @@ set -e
 ./shopfix.exe ACtmp4.dll ACtmp5.dll | tail -3
 ./modesfix.exe ACtmp5.dll ACtmp6.dll "${CHA_MODES:-hurdle,tradecar}" | tail -3
 ./tradefix.exe ACtmp6.dll ACtmp7.dll | tail -2
-./titlefix.exe ACtmp7.dll ACCN.dll "${CHA_TITLE_FRAMES:-180}" | tail -3
-rm -f ACtmp.dll ACtmp2.dll ACtmp3.dll ACtmp4.dll ACtmp5.dll ACtmp7.dll
+./titlefix.exe ACtmp7.dll ACtmp8.dll "${CHA_TITLE_FRAMES:-180}" | tail -3
+ ./pausefix.exe ACtmp8.dll ACCN.dll mgbase | tail -3
+rm -f ACtmp.dll ACtmp2.dll ACtmp3.dll ACtmp4.dll ACtmp5.dll ACtmp7.dll ACtmp8.dll
 cp ACCN.dll x77/assets/bin/Data/Managed/Assembly-CSharp.dll
 echo "x77 에 반영 완료"

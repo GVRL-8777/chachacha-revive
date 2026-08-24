@@ -55,7 +55,7 @@ GROUPS = {
         ('APK 에 들어가는 코드', 'ChaLocal.cs ChaLocalData.cs'),
         ('게임 DLL 패처', """localfix.cs patchcn.cs patch8.cs dbhook.cs tunnelfix.cs
             shopfix.cs titlefix.cs tradefix.cs rankfix.cs invitefix.cs modesfix.cs
-            notutorial.cs restore.cs strswap.cs chkrefs.cs"""),
+            notutorial.cs pausefix.cs restore.cs strswap.cs chkrefs.cs"""),
         ('DLL 을 들여다보는 도구', """dump.cs alltype.cs cdump.cs tdump.cs lst.cs tn.cs
             tn2.cs fld.cs flddump.cs fldref.cs fieldinfo.cs sigdump.cs enums.cs
             enumdump.cs enumval.cs callsite.cs site3.cs s4.cs apidump.cs

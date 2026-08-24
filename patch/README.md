@@ -14,7 +14,7 @@
 
 ---
 
-## 담긴 파일 41개
+## 담긴 파일 42개
 
 ### 이 폴더
 
@@ -45,6 +45,7 @@
 | `invitefix.cs` | 초대 목록을 소셜 플랫폼 없이도 채운다. |
 | `modesfix.cs` | 중국판이 꺼 둔 모드를 켠다. |
 | `notutorial.cs` | 중국 배포판에만 있는 '도움말 팝업' 네 개를 띄우지 않는다. |
+| `pausefix.cs` | 주행 중 일시정지로 나가면 로비 BGM 이 안 나오는 것을 고친다. |
 | `restore.cs` | UnityEngine.dll 에서 바이트코드 스트리퍼가 잘라낸 메서드 선언을 되살린다. |
 | `strswap.cs` | DLL 안의 ldstr 리터럴을 통째로 치환한다 (Cecil 이 재작성하므로 길이 제약 없음). |
 | `chkrefs.cs` | ChaLocal.dll 이 부르는 모든 바깥 멤버가 게임의 Managed 폴더 안에 **실제로 있는지** 검사한다. |

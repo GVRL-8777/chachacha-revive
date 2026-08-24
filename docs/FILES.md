@@ -1,6 +1,6 @@
 # 파일 하나하나가 하는 일
 
-저장소에 든 282개 파일의 한 줄 요약입니다. 같은 설명이 각 파일 첫머리에도
+저장소에 든 295개 파일의 한 줄 요약입니다. 같은 설명이 각 파일 첫머리에도
 주석으로 붙어 있고, 이 문서는 거기서 긁어 만듭니다 (`python tools/mkfiles.py`).
 
 ---
@@ -68,11 +68,6 @@
 | `mktaegeuk.py` | 사진 한 장에서 새 자동차 '태극호'를 만들어 넣는다. |
 | `carmesh.py` | 새 자동차의 메시를 만든다. |
 | `addtaegeuk.py` | 태극호를 게임 데이터에 등록한다. |
-| `addtroy.py` | 잘려 나간 차 **트로이**(트로이 목마)를 게임 안에 되살린다. |
-| `voxout.py` | 드라이버 보이스를 귀로 들을 수 있게 파일로 뽑는다. |
-| `hires.py` | 주행 UI 아틀라스를 2배 해상도로 올린다(그림은 한국 초기판). |
-| `troyicon.py` | 트로이의 자동차 샵 아이콘을 모델에서 렌더해 아틀라스에 넣는다. |
-| `packadd.py` | 이미 구운 번들에 자산 파일 하나를 덧붙인다(다시 굽지 않는다). |
 | `addhelly.py` | 차량 DB(JSON TextAsset)에 helly(변신 로봇)를 추가하고 다시 자산으로 만든다. |
 | `cardb.py` | 빌드에서 CarDataBase 를 읽어 옵니다 (TextAsset 안의 JSON). |
 | `carprice.py` | CarDataBase 안의 차 한 대 값을 고칩니다. |
@@ -166,11 +161,20 @@
 
 | 파일 | 하는 일 |
 |---|---|
+| `addtroy.py` | 잘려 나간 차 **트로이**를 게임 안에 되살린다. |
+| `bakedcar.py` | 프리팹에 **박혀 있는** 차 이름을 한국 정식 이름으로 고친다. |
+| `dexegl.py` | 유니티의 **EGL 설정 고르는 코드**를 고친다 (Mali 기기에서 3D 가 검게 나오는 문제). |
+| `hires.py` | 주행 화면 UI 를 **2배 해상도**로 올린다. |
+| `krmerge.py` | 게임 안 한국어 표를 **한국 정식판 것으로** 바꾼다. |
+| `meshuncompress.py` | **압축된 메시**를 풀어서 보통 정점 데이터로 다시 저장한다. |
+| `packadd.py` | 이미 구운 번들에 자산 파일 하나를 **덧붙인다.** 왜 필요한가. |
 | `progshader.py` | 고정기능 셰이더를 **프로그램 셰이더**로 갈아 끼운다. |
 | `setshader.py` | 재질이 가리키는 셰이더를 다른 것으로 갈아 끼운다. |
 | `sfedit.py` | 직렬화 파일 안의 오브젝트 하나를 **길이가 달라져도** 갈아 끼운다. |
 | `texsettings.py` | 텍스처의 샘플러 설정(필터 · 랩 · 이방성)을 고친다. |
-| `uncompress.py` | 압축 텍스처를 **압축 없는 형식**으로 바꾼다. |
+| `troyicon.py` | 트로이의 **자동차 샵 아이콘**을 만들어 아틀라스에 넣는다. |
+| `uncompress.py` | **DXT 텍스처**를 다른 형식으로 다시 굽는다. |
+| `voxout.py` | 드라이버 보이스를 **귀로 들을 수 있게** 파일로 뽑는다. |
 
 ---
 
@@ -207,6 +211,7 @@ C# 소스. Cecil 패처와, APK 안에 들어가는 코드입니다.
 | `invitefix.cs` | 초대 목록을 소셜 플랫폼 없이도 채운다. |
 | `modesfix.cs` | 중국판이 꺼 둔 모드를 켠다. |
 | `notutorial.cs` | 중국 배포판에만 있는 '도움말 팝업' 네 개를 띄우지 않는다. |
+| `pausefix.cs` | 주행 중 일시정지로 나가면 로비 BGM 이 안 나오는 것을 고친다. |
 | `restore.cs` | UnityEngine.dll 에서 바이트코드 스트리퍼가 잘라낸 메서드 선언을 되살린다. |
 | `strswap.cs` | DLL 안의 ldstr 리터럴을 통째로 치환한다 (Cecil 이 재작성하므로 길이 제약 없음). |
 | `chkrefs.cs` | ChaLocal.dll 이 부르는 모든 바깥 멤버가 게임의 Managed 폴더 안에 **실제로 있는지** 검사한다. |
@@ -414,16 +419,16 @@ C# 소스. Cecil 패처와, APK 안에 들어가는 코드입니다.
 | [`CAPTURE.md`](CAPTURE.md) | 요청 스키마 수집기 (Schema Collector) |
 | [`DORMANT.md`](DORMANT.md) | 묻어 둔 기능들 |
 | [`FILES.md`](FILES.md) | 이 문서. 파일 하나하나가 하는 일. |
-| [`HIRES.md`](HIRES.md) | 2배 해상도 UI — 그림은 한국 초기판 것으로 |
 | [`GPU.md`](GPU.md) | 어떤 폰에서는 3D 가 안 나온다 (Mali · 안드로이드 16) |
+| [`HIRES.md`](HIRES.md) | 2배 해상도 UI — 그림은 한국 초기판 것으로 |
 | [`LOCALAPK.md`](LOCALAPK.md) | 서버 없는 로컬 전용 APK — 완성 (2026-08-21) |
 | [`NEWCAR.md`](NEWCAR.md) | 새 차 추가 — 덮어쓰지 않고 한 대를 늘립니다 |
 | [`PRESETS.md`](PRESETS.md) | 판 가르기 — 이제 **세이브 파일**입니다 |
 | [`README.md`](README.md) | `docs/` — 연구 기록 |
 | [`RESTORE.md`](RESTORE.md) | 되살리는 법 |
 | [`TOOL.md`](TOOL.md) | chatool — 다함께 차차차 통합 도구 |
-| [`VOICE.md`](VOICE.md) | 드라이버 보이스 — 한국어가 들리지 않던 까닭 |
 | [`TROY.md`](TROY.md) | 트로이 — 잘려 나간 차를 되살리다 |
+| [`VOICE.md`](VOICE.md) | 드라이버 보이스 — 한국어가 들리지 않던 까닭 |
 
 ---
 
