@@ -32,20 +32,23 @@ GROUPS = {
             chalauncher.py mkfiles.py"""),
         ('사설 서버', 'chacnserver.py mkskel.py'),
         ('APK 만들기', """pack.py buildapk.py setappname.py setpkg.py mkbundle.py
-            mkpack.py mapspec.py dump_systemtext.py"""),
+            mkpack.py packadd.py mapspec.py dump_systemtext.py"""),
         ('차 · 드라이버 · 자산', """chaassets.py chaanim.py chaanimglb.py newcar.py
-            mktaegeuk.py carmesh.py addtaegeuk.py addhelly.py cardb.py carprice.py
-            trimcars.py chadrv.py drvprice.py drvfont.py chaskill.py voicefix.py
-            titlevoice.py"""),
-        ('한글화', """mkkorean.py krtext.py krtitle.py korean_res.py bakedkr.py
-            swapfont.py fitlabels.py scanwidth.py freetext.py report.py"""),
-        ('UI 프리팹 손질', """activate.py atlasadd.py uiatlas.py fixatlas.py
+            mktaegeuk.py carmesh.py addtaegeuk.py addhelly.py addtroy.py troyicon.py
+            cardb.py carprice.py trimcars.py chadrv.py drvprice.py drvfont.py
+            chaskill.py voicefix.py voxout.py titlevoice.py"""),
+        ('한글화', """mkkorean.py krmerge.py krtext.py krtitle.py korean_res.py
+            bakedkr.py bakedcar.py bakedtext.py swapfont.py fitlabels.py
+            scanwidth.py freetext.py report.py"""),
+        ('UI 프리팹 손질', """activate.py atlasadd.py uiatlas.py hires.py fixatlas.py
             fixatlasref.py clonecard.py renamecard.py setsprite.py setsprname.py
             setpc.py movesprite.py moveobj.py expandarrays.py fixbuttons.py
             fixclip.py fixkeys.py fixlabels.py tradeui.py fixaqua.py"""),
-        ('직렬화 파일 다루기', """sfparse.py sfx.py sfmerge.py sfmerge_new.py sfwrite.py
+        ('직렬화 파일 다루기', """sfparse.py sfedit.py sfx.py sfmerge.py sfmerge_new.py sfwrite.py
             sfwrite2.py sfwrite3.py sfwrite_replay.py setext.py fixext.py
             derename.py offset.py xdeps.py deps.py"""),
+        ('그림 · 메시 · 셰이더', """progshader.py setshader.py texsettings.py
+            uncompress.py meshuncompress.py dexegl.py"""),
         ('검사 · 조사', """audit.py checkbundle.py checkrefs.py conflicts.py
             sharedusage.py sharedone.py analyze.py vercmp.py scanaudio.py
             scansplit.py ildis.py ildump.py ilscan.py typemap.py mkreport.py"""),

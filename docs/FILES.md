@@ -1,6 +1,6 @@
 # 파일 하나하나가 하는 일
 
-저장소에 든 295개 파일의 한 줄 요약입니다. 같은 설명이 각 파일 첫머리에도
+저장소에 든 296개 파일의 한 줄 요약입니다. 같은 설명이 각 파일 첫머리에도
 주석으로 붙어 있고, 이 문서는 거기서 긁어 만듭니다 (`python tools/mkfiles.py`).
 
 ---
@@ -54,6 +54,7 @@
 | `setpkg.py` | APK 의 **패키지 이름**을 바꿉니다. |
 | `mkbundle.py` | 유니티 4 용 UnityRaw(무압축) 에셋번들을 만든다. |
 | `mkpack.py` | packspec.txt 를 읽어 복원 자산 번들(bundles/pack.unity3d)을 다시 만듭니다. |
+| `packadd.py` | 이미 구운 번들에 자산 파일 하나를 **덧붙인다.** 왜 필요한가. |
 | `mapspec.py` | 이식할 맵 테마의 sfmerge 스펙과 의존 파일 목록을 만든다. |
 | `dump_systemtext.py` | APK 를 푼 폴더에서 `tb_systemtext` 를 텍스트로 꺼낸다. |
 
@@ -69,6 +70,8 @@
 | `carmesh.py` | 새 자동차의 메시를 만든다. |
 | `addtaegeuk.py` | 태극호를 게임 데이터에 등록한다. |
 | `addhelly.py` | 차량 DB(JSON TextAsset)에 helly(변신 로봇)를 추가하고 다시 자산으로 만든다. |
+| `addtroy.py` | 잘려 나간 차 **트로이**를 게임 안에 되살린다. |
+| `troyicon.py` | 트로이의 **자동차 샵 아이콘**을 만들어 아틀라스에 넣는다. |
 | `cardb.py` | 빌드에서 CarDataBase 를 읽어 옵니다 (TextAsset 안의 JSON). |
 | `carprice.py` | CarDataBase 안의 차 한 대 값을 고칩니다. |
 | `trimcars.py` | CarDataBase 에서 **모델이 없는 차**를 지운다. |
@@ -77,6 +80,7 @@
 | `drvfont.py` | 드라이버 선택 창의 능력 설명 글자 크기를 줄입니다. |
 | `chaskill.py` | 스킬 표 — `DataBase/SkillDataBase` 를 읽습니다. |
 | `voicefix.py` | 기본 드라이버 4명의 보이스를 딴 판의 것으로 갈아 끼웁니다. |
+| `voxout.py` | 드라이버 보이스를 **귀로 들을 수 있게** 파일로 뽑는다. |
 | `titlevoice.py` | 타이틀 로고 보이스('다함께 차차차!')를 한국어로 바꿉니다. |
 
 ### 한글화
@@ -84,10 +88,13 @@
 | 파일 | 하는 일 |
 |---|---|
 | `mkkorean.py` | 한국어 문자열표를 만들어 중국판 자산에 써 넣는다. |
+| `krmerge.py` | 게임 안 한국어 표를 **한국 정식판 것으로** 바꾼다. |
 | `krtext.py` | tb_systemtext 의 문구를 **길이를 지키며** 바꾼다. |
 | `krtitle.py` | 타이틀 로고를 한국판 것으로 바꾼다. |
 | `korean_res.py` | 중국 배포판에만 있는 중국어 이미지를 한국판 것으로 바꾼다. |
 | `bakedkr.py` | 프리팹에 **박혀 있는** 중국어 UILabel 을 한국어로 바꾼다. |
+| `bakedcar.py` | 프리팹에 **박혀 있는** 차 이름을 한국 정식 이름으로 고친다. |
+| `bakedtext.py` | 프리팹에 박힌 문구 중 **말이 어긋난 것**을 고친다. |
 | `swapfont.py` | 중국판의 동적 폰트를 한글 지원 폰트로 갈아끼운다. |
 | `fitlabels.py` | 한글화로 넘치는 UILabel 에 줄바꿈 폭(mMaxLineWidth)을 자동으로 넣는다. |
 | `scanwidth.py` | 한글화로 문자열이 얼마나 넓어졌는지 전수 조사한다. |
@@ -101,6 +108,7 @@
 | `activate.py` | 프리팹 안의 특정 GameObject 를 활성 상태로 켠다. |
 | `atlasadd.py` | NGUI UIAtlas(MonoBehaviour)에 스프라이트 정의를 추가한다. |
 | `uiatlas.py` | NGUI UIAtlas(MonoBehaviour) 원시 바이트에서 스프라이트 표를 읽고 쓴다. |
+| `hires.py` | 주행 화면 UI 를 **2배 해상도**로 올린다. |
 | `fixatlas.py` | UI 아틀라스의 스프라이트 표를 **올바른 레코드 구조로** 다시 쓴다. |
 | `fixatlasref.py` | 복제 카드에서 망가진 아틀라스 참조(fileID)를 되돌린다. |
 | `clonecard.py` | 프리팹 안의 서브트리(드라이버 카드)를 통째로 복제한다. |
@@ -123,6 +131,7 @@
 | 파일 | 하는 일 |
 |---|---|
 | `sfparse.py` | 유니티 SerializedFile(포맷 9) 정밀 파서. |
+| `sfedit.py` | 직렬화 파일 안의 오브젝트 하나를 **길이가 달라져도** 갈아 끼운다. |
 | `sfx.py` | Unity 4 SerializedFile 의 외부참조(externals) 를 읽는다. |
 | `sfmerge.py` | 여러 직렬화 파일을 **하나의** 번들용 직렬화 파일로 합친다. |
 | `sfmerge_new.py` | 여러 직렬화 파일을 **하나의** 번들용 직렬화 파일로 합친다. |
@@ -136,6 +145,17 @@
 | `offset.py` | 이식한 세그먼트의 루트 Transform 위치를 보정한다. |
 | `xdeps.py` | 이식 자산의 의존 파일을 **이름 충돌 없이** 옮긴다. |
 | `deps.py` | 자산 파일이 참조하는 외부 파일을 재귀로 모아 overlay 폴더에 복사한다. |
+
+### 그림 · 메시 · 셰이더
+
+| 파일 | 하는 일 |
+|---|---|
+| `progshader.py` | 고정기능 셰이더를 **프로그램 셰이더**로 갈아 끼운다. |
+| `setshader.py` | 재질이 가리키는 셰이더를 다른 것으로 갈아 끼운다. |
+| `texsettings.py` | 텍스처의 샘플러 설정(필터 · 랩 · 이방성)을 고친다. |
+| `uncompress.py` | **DXT 텍스처**를 다른 형식으로 다시 굽는다. |
+| `meshuncompress.py` | **압축된 메시**를 풀어서 보통 정점 데이터로 다시 저장한다. |
+| `dexegl.py` | 유니티의 **EGL 설정 고르는 코드**를 고친다 (Mali 기기에서 3D 가 검게 나오는 문제). |
 
 ### 검사 · 조사
 
@@ -156,25 +176,6 @@
 | `ilscan.py` | .NET 어셈블리에서 '메서드별 문자열 리터럴'을 추출한다. |
 | `typemap.py` | NetRecive.* 응답 클래스의 "키 -> 타입" 표를 IL 에서 통째로 뽑는다. |
 | `mkreport.py` | 조사 결과를 훑어보기 좋은 HTML 문서로 만든다. |
-
-### 그 밖
-
-| 파일 | 하는 일 |
-|---|---|
-| `addtroy.py` | 잘려 나간 차 **트로이**를 게임 안에 되살린다. |
-| `bakedcar.py` | 프리팹에 **박혀 있는** 차 이름을 한국 정식 이름으로 고친다. |
-| `dexegl.py` | 유니티의 **EGL 설정 고르는 코드**를 고친다 (Mali 기기에서 3D 가 검게 나오는 문제). |
-| `hires.py` | 주행 화면 UI 를 **2배 해상도**로 올린다. |
-| `krmerge.py` | 게임 안 한국어 표를 **한국 정식판 것으로** 바꾼다. |
-| `meshuncompress.py` | **압축된 메시**를 풀어서 보통 정점 데이터로 다시 저장한다. |
-| `packadd.py` | 이미 구운 번들에 자산 파일 하나를 **덧붙인다.** 왜 필요한가. |
-| `progshader.py` | 고정기능 셰이더를 **프로그램 셰이더**로 갈아 끼운다. |
-| `setshader.py` | 재질이 가리키는 셰이더를 다른 것으로 갈아 끼운다. |
-| `sfedit.py` | 직렬화 파일 안의 오브젝트 하나를 **길이가 달라져도** 갈아 끼운다. |
-| `texsettings.py` | 텍스처의 샘플러 설정(필터 · 랩 · 이방성)을 고친다. |
-| `troyicon.py` | 트로이의 **자동차 샵 아이콘**을 만들어 아틀라스에 넣는다. |
-| `uncompress.py` | **DXT 텍스처**를 다른 형식으로 다시 굽는다. |
-| `voxout.py` | 드라이버 보이스를 **귀로 들을 수 있게** 파일로 뽑는다. |
 
 ---
 
