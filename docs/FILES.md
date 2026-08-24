@@ -68,6 +68,11 @@
 | `mktaegeuk.py` | 사진 한 장에서 새 자동차 '태극호'를 만들어 넣는다. |
 | `carmesh.py` | 새 자동차의 메시를 만든다. |
 | `addtaegeuk.py` | 태극호를 게임 데이터에 등록한다. |
+| `addtroy.py` | 잘려 나간 차 **트로이**(트로이 목마)를 게임 안에 되살린다. |
+| `voxout.py` | 드라이버 보이스를 귀로 들을 수 있게 파일로 뽑는다. |
+| `hires.py` | 주행 UI 아틀라스를 2배 해상도로 올린다(그림은 한국 초기판). |
+| `troyicon.py` | 트로이의 자동차 샵 아이콘을 모델에서 렌더해 아틀라스에 넣는다. |
+| `packadd.py` | 이미 구운 번들에 자산 파일 하나를 덧붙인다(다시 굽지 않는다). |
 | `addhelly.py` | 차량 DB(JSON TextAsset)에 helly(변신 로봇)를 추가하고 다시 자산으로 만든다. |
 | `cardb.py` | 빌드에서 CarDataBase 를 읽어 옵니다 (TextAsset 안의 JSON). |
 | `carprice.py` | CarDataBase 안의 차 한 대 값을 고칩니다. |
@@ -409,6 +414,7 @@ C# 소스. Cecil 패처와, APK 안에 들어가는 코드입니다.
 | [`CAPTURE.md`](CAPTURE.md) | 요청 스키마 수집기 (Schema Collector) |
 | [`DORMANT.md`](DORMANT.md) | 묻어 둔 기능들 |
 | [`FILES.md`](FILES.md) | 이 문서. 파일 하나하나가 하는 일. |
+| [`HIRES.md`](HIRES.md) | 2배 해상도 UI — 그림은 한국 초기판 것으로 |
 | [`GPU.md`](GPU.md) | 어떤 폰에서는 3D 가 안 나온다 (Mali · 안드로이드 16) |
 | [`LOCALAPK.md`](LOCALAPK.md) | 서버 없는 로컬 전용 APK — 완성 (2026-08-21) |
 | [`NEWCAR.md`](NEWCAR.md) | 새 차 추가 — 덮어쓰지 않고 한 대를 늘립니다 |
@@ -416,6 +422,8 @@ C# 소스. Cecil 패처와, APK 안에 들어가는 코드입니다.
 | [`README.md`](README.md) | `docs/` — 연구 기록 |
 | [`RESTORE.md`](RESTORE.md) | 되살리는 법 |
 | [`TOOL.md`](TOOL.md) | chatool — 다함께 차차차 통합 도구 |
+| [`VOICE.md`](VOICE.md) | 드라이버 보이스 — 한국어가 들리지 않던 까닭 |
+| [`TROY.md`](TROY.md) | 트로이 — 잘려 나간 차를 되살리다 |
 
 ---
 

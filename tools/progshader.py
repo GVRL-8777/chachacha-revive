@@ -58,6 +58,7 @@ varying highp vec2 xlv_TEXCOORD0;
 uniform sampler2D _MainTex;
 void main ()
 {
+  BODYMARK
   gl_FragData[0] = SOLIDMARK texture2D (_MainTex, xlv_TEXCOORD0);
 }
 #endif"
@@ -109,13 +110,20 @@ def show(tree):
     return 0
 
 
+def _bakpath():
+    # 백업을 트리 **밖**에 둔다. 트리 안에 두면 APK 에 딸려 들어간다.
+    d = os.path.join(HERE, 'backup', 'shader')
+    os.makedirs(d, exist_ok=True)
+    return os.path.join(d, os.path.basename(TARGET) + '.fixedfunc')
+
+
 def swap(tree, solid=False):
     from sfparse import parse
     p, env = _load(tree)
-    bak = p + '.fixedfunc.bak'
+    bak = _bakpath()
     if not os.path.exists(bak):
         shutil.copy2(p, bak)
-        print('  원본을 남겨 둠: %s' % os.path.basename(bak))
+        print('  원본을 남겨 둠: backup/shader/')
 
     target = None
     for o in env.objects:
@@ -134,8 +142,27 @@ def swap(tree, solid=False):
             # 아예 안 묶여 0 인지 가르는 시험이다.
             'amp': ('vec4(clamp(texture2D (_MainTex, xlv_TEXCOORD0).xyz'
                     ' * 32.0, 0.0, 1.0), 1.0); //'),
+            # UV 를 한복판에 박는다. 텍스처가 묶여 있으면 몸통이 그 한 점
+            # 색으로 **평평하게** 칠해진다. 그래도 검으면 안 묶인 것이다.
+            'center': 'texture2D (_MainTex, vec2(0.5, 0.5)); //',
+            'discard': '',
+            # 표본과 UV 를 **한 화면에** 담는다. 빨강·초록은 텍스처,
+            # 파랑은 UV.x 다. 파랑만 보이면 varying 을 좌표로 쓸 때만
+            # 표본이 0 이라는 뜻이다.
+            'mix': ('vec4(texture2D (_MainTex, xlv_TEXCOORD0).xy,'
+                    ' xlv_TEXCOORD0.x * 0.6, 1.0); //'),
+            # varying 을 식에 넣되 값은 한복판으로 죽인다. 이게 나오면
+            # varying 자체가 아니라 그 **값**이 문제다.
+            'killuv': ('texture2D (_MainTex,'
+                       ' (xlv_TEXCOORD0 * 0.0) + vec2(0.5, 0.5)); //'),
             '': ''}[solid or '']
-    src = NEW_SHADER.replace('SOLIDMARK ', mark)
+    # 표본이 0 인 픽셀을 버린다. 깊이 버퍼가 없어 **검은 그림자 복사본이
+    # 차 위를 덮는지** 가리는 시험이다. 덮는 것이면 차가 드러난다.
+    body = ('if (dot(texture2D (_MainTex, xlv_TEXCOORD0).xyz,'
+            ' vec3(1.0)) < 0.02) discard;') if solid == 'discard' else ''
+    if solid == 'discard':
+        mark = ''
+    src = NEW_SHADER.replace('SOLIDMARK ', mark).replace('BODYMARK', body)
     t['m_Script'] = src
     body = bytes(o.save_typetree(t))
 
@@ -188,9 +215,13 @@ def swap(tree, solid=False):
 
 def restore(tree):
     p = os.path.join(tree, TARGET)
-    bak = p + '.fixedfunc.bak'
+    bak = _bakpath()
     if not os.path.exists(bak):
-        raise SystemExit('남겨 둔 원본이 없습니다')
+        old = p + '.fixedfunc.bak'          # 예전 자리
+        if os.path.exists(old):
+            bak = old
+        else:
+            raise SystemExit('남겨 둔 원본이 없습니다')
     shutil.copy2(bak, p)
     print('  원래대로 돌렸습니다')
     return 0
@@ -201,8 +232,8 @@ def main():
     ap.add_argument('--tree', default=os.path.join(HERE, 'x77'))
     ap.add_argument('--show', action='store_true')
     ap.add_argument('--restore', action='store_true')
-    ap.add_argument('--solid', choices=('red', 'uv', 'amp'),
-                    help='시험용 — red: 빨강만, uv: UV 를 색으로, amp: 표본 32배')
+    ap.add_argument('--solid', choices=('red', 'uv', 'amp', 'center', 'mix', 'killuv', 'discard'),
+                    help='시험용 — red: 빨강만, uv: UV 를 색으로, amp: 표본 32배, center: UV 를 한복판 고정')
     a = ap.parse_args()
     if a.show:
         return show(a.tree)
