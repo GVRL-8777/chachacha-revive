@@ -26,7 +26,28 @@
 (미아우→미야우). 이쪽은 길이가 달라지므로(16→13바이트) 오브젝트를 다시
 짜야 한다. `sfedit.replace_object` 가 그 일을 한다.
 
+## 남은 중국어는 없나 (`--survey`)
+
+프리팹에 박힌 라벨을 전수로 훑어 **한자가 남은 것**을 찾고, 그것이 화면에
+실제로 나오는지까지 가른다. 갈래는 그 라벨과 같은 GameObject 에 붙은
+`UILocalize` 로 정한다.
+
+    표에 있는 열쇠   실행 중 표에서 덮어쓴다  → 화면엔 한국어
+    표에 없는 열쇠   덮어쓰기가 헛돈다        → **봐야 한다**
+    빈 열쇠         아무 일도 안 한다        → **봐야 한다**
+    UILocalize 없음 손댄 적 없다             → **봐야 한다**
+
+`UILocalize` 가 **붙어 있다는 것만으로는 안전하지 않다.** 일시정지 제목이
+바로 그랬다 — `UILocalize` 는 있는데 열쇠가 비어 있어 박힌 글이 그대로
+나왔다. 열쇠까지 봐야 한다.
+
+2026-08-24 실측: 한자가 남은 라벨 94개 중 **93개는 표에 있는 열쇠**로
+덮어써지고, 하나(`ShopMain` 의 `ItemCommnet_Label`)는 열쇠가 비어 있으나
+`项目名称…` 를 되풀이한 **자리표시자**라 상점을 열면 곧바로 한국어 설명으로
+덮인다(실기 확인). **화면에 보이는 중국어는 없다.**
+
     python tools/bakedtext.py --scan     어디에 무엇이 박혀 있나
+    python tools/bakedtext.py --survey   남은 중국어를 전수로 훑는다
     python tools/bakedtext.py            고친다
     python tools/bakedtext.py --restore  backup/bakedtext 에서 되돌린다
 """
@@ -109,6 +130,113 @@ def find(say=lambda *a: None):
     return hits
 
 
+UILOCALIZE = 428        # sharedassets0 안 UILocalize MonoScript 의 pathID
+TABLE = '50295c6b20ff907439e2ef8aa05f9ea7'      # 문자열표 자산
+
+
+def _keys():
+    """문자열표의 열쇠 집합."""
+    from sfparse import parse
+    p = os.path.join(XD, TABLE)
+    meta = parse(p)
+    raw = io.open(p, 'rb').read()
+    rec = [o for o in meta['objects'] if o['path_id'] == 1][0]
+    b = raw[meta['data_offset'] + rec['start']:][:rec['size']]
+    n = struct.unpack_from('<i', b, 0)[0]
+    off = 4 + n
+    off += (-off) % 4
+    tl = struct.unpack_from('<i', b, off)[0]
+    out = set()
+    text = b[off + 4:off + 4 + tl].decode('utf-8')
+    for line in text.replace('\r\n', '\n').split('\n'):
+        if ' = ' in line:
+            out.add(line.split(' = ', 1)[0].strip())
+    return out
+
+
+def _str(b, i):
+    n = struct.unpack_from('<i', b, i)[0]
+    if n < 0 or i + 4 + n > len(b):
+        return None
+    try:
+        return b[i + 4:i + 4 + n].decode('utf-8')
+    except Exception:
+        return None
+
+
+def survey(say=print):
+    """한자가 남은 라벨을 찾고, 화면에 나오는지까지 가른다."""
+    import re
+    import UnityPy
+    from sfparse import parse
+    han = re.compile(u'[一-鿿]')
+    keys = _keys()
+    say('문자열표 열쇠 %d개' % len(keys))
+    buckets = {'표에 있는 열쇠': [], '표에 없는 열쇠': [],
+               '빈 열쇠': [], 'UILocalize 없음': []}
+    for name, p in _files():
+        try:
+            meta = parse(p)
+            env = UnityPy.load(p)
+        except Exception:
+            continue
+        raw = io.open(p, 'rb').read()
+        recs = dict((o['path_id'], o) for o in meta['objects'])
+        comps = {}
+        for o in env.objects:
+            if o.type.name != 'GameObject':
+                continue
+            try:
+                t = o.read_typetree()
+            except Exception:
+                continue
+            comps[o.path_id] = [c[1]['m_PathID'] for c in t['m_Component']
+                                if c[1]['m_FileID'] == 0]
+        for o in meta['objects']:
+            if o['class_id'] != 114 or o['size'] < TEXT_OFF + 8:
+                continue
+            b = raw[meta['data_offset'] + o['start']:][:o['size']]
+            t = _read(b)
+            if not t or not han.search(t):
+                continue
+            go = struct.unpack_from('<ii', b, 0)[1]
+            key = None
+            for cp in comps.get(go, []):
+                r = recs.get(cp)
+                if not r or r['class_id'] != 114:
+                    continue
+                cb = raw[meta['data_offset'] + r['start']:][:r['size']]
+                if len(cb) < 24:
+                    continue
+                if struct.unpack_from('<ii', cb, 12)[1] != UILOCALIZE:
+                    continue
+                key = _str(cb, 24) or ''
+                break
+            item = (name[:18], o['path_id'], key,
+                    t.replace('\n', ' ')[:40])
+            if key is None:
+                buckets['UILocalize 없음'].append(item)
+            elif key == '':
+                buckets['빈 열쇠'].append(item)
+            elif key in keys:
+                buckets['표에 있는 열쇠'].append(item)
+            else:
+                buckets['표에 없는 열쇠'].append(item)
+    total = sum(len(v) for v in buckets.values())
+    say('한자가 남은 라벨 %d개' % total)
+    for k in ('표에 있는 열쇠', '표에 없는 열쇠', '빈 열쇠', 'UILocalize 없음'):
+        mark = '  (화면엔 한국어)' if k == '표에 있는 열쇠' else '  ← 봐야 한다'
+        say('  %-14s %3d개%s' % (k, len(buckets[k]), mark if buckets[k] or k == '표에 있는 열쇠' else ''))
+    for k in ('빈 열쇠', 'UILocalize 없음', '표에 없는 열쇠'):
+        if not buckets[k]:
+            continue
+        say('')
+        say('--- %s ---' % k)
+        for x in buckets[k][:20]:
+            say('  %-18s pid %-6s key=%-20r %r' % x)
+    return 0
+
+
 def scan(say=print):
     for old, new, why in FIX:
         say('  %-14s → %-12s %s' % (old, new, why))
@@ -156,8 +284,11 @@ def restore(say=print):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--scan', action='store_true')
+    ap.add_argument('--survey', action='store_true')
     ap.add_argument('--restore', action='store_true')
     a = ap.parse_args()
+    if a.survey:
+        return survey()
     if a.scan:
         return scan()
     if a.restore:
