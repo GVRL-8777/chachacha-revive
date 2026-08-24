@@ -14,7 +14,7 @@ python tools/chapaths.py         원본 APK 가 어디 있는지 확인
 
 ---
 
-## 담긴 파일 118개
+## 담긴 파일 124개
 
 ### 이 폴더
 
@@ -79,6 +79,10 @@ python tools/chapaths.py         원본 APK 가 어디 있는지 확인
 | `addhelly.py` | 차량 DB(JSON TextAsset)에 helly(변신 로봇)를 추가하고 다시 자산으로 만든다. |
 | `addtroy.py` | 잘려 나간 차 **트로이**를 게임 안에 되살린다. |
 | `troyicon.py` | 트로이의 **자동차 샵 아이콘**을 만들어 아틀라스에 넣는다. |
+| `addcars5.py` | 한국 정식판 5.1.0 에서 **정품 차 8대**를 지금 빌드로 옮긴다. |
+| `carsicon.py` | 아크엔젤 · W3 · 블리츠의 **아이콘**을 5.1.0 아틀라스에서 옮겨 온다. |
+| `addvox5.py` | 빠져 있던 **캐릭터 보이스 세 벌**을 5.1.0 에서 옮겨 온다. |
+| `bundlechain.py` | 번들에 **차례로 덧붙이는** 도구들이 서로를 지우지 않게 한다. |
 | `cardb.py` | 빌드에서 CarDataBase 를 읽어 옵니다 (TextAsset 안의 JSON). |
 | `carprice.py` | CarDataBase 안의 차 한 대 값을 고칩니다. |
 | `trimcars.py` | CarDataBase 에서 **모델이 없는 차**를 지운다. |
@@ -183,6 +187,13 @@ python tools/chapaths.py         원본 APK 가 어디 있는지 확인
 | `ilscan.py` | .NET 어셈블리에서 '메서드별 문자열 리터럴'을 추출한다. |
 | `typemap.py` | NetRecive.* 응답 클래스의 "키 -> 타입" 표를 IL 에서 통째로 뽑는다. |
 | `mkreport.py` | 조사 결과를 훑어보기 좋은 HTML 문서로 만든다. |
+
+### 그 밖
+
+| 파일 | 하는 일 |
+|---|---|
+| `cutin5.py` | 빠져 있던 **컷인 그림 열 장**을 5.1.0 에서 옮겨 온다. |
+| `rankphoto.py` | 주간순위의 **프로필 사진**을 한국 초기판 데모 화면에서 오려 낸다. |
 
 ---
 

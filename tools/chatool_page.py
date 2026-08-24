@@ -694,14 +694,7 @@ function drawOut(){
           <button class="danger" onclick="devRm()">${T('폰에서 지우기')}</button>
         </div>
         <div class="hint">${T('앱이 켜져 있으면 상태를 메모리에 들고 있어 파일만 갈아 끼워서는 화면이 안 바뀝니다. 넣은 뒤 앱을 껐다 켜세요.')}</div>
-        <label class="f" style="margin-top:10px">${T('폰의 판')}</label>
-        <div class="btns" style="margin-top:0">
-          <button onclick="devMode('local')">${T('로컬로')}</button>
-          <button onclick="devMode('server')">${T('서버로')}</button>
-        </div>
-        <div class="hint">${T('둘 다 넣어 구운 APK 에서만 뜻이 있습니다. '
-          + '게임 안 겹판에서도 바꿀 수 있고, 어느 쪽이든 앱을 껐다 켜야 '
-          + '먹습니다.')}</div>
+
         <div id="o_devdetail"></div>
       </div>
     </div>
@@ -716,7 +709,6 @@ function drawOut(){
         <select id="b_mode" onchange="modeChanged()">
           <option value="local">${T('로컬 전용 — 서버 없이 폰 안에서 돕니다')}</option>
           <option value="server">${T('서버 전용 — PC 의 chacnserver.py 에 붙습니다')}</option>
-          <option value="both">${T('둘 다 — 게임 안에서 판을 바꿉니다')}</option>
         </select>
       </div>
       <div>
@@ -878,7 +870,6 @@ async function pickDev(i){
     + `<div class="hint">${esc(O.dev[i].remote)}</div>`
     + foldBar('dev:') + secTable(j.sections,'dev:') + carTable(j.cars,'dev:');
 }
-async function devMode(m){ await api('/api/adb/mode', {mode:m}); }
 async function devPush(){
   const spot=$('#o_spot');
   const j=await api('/api/dev/push',{name:cur,remote:(spot&&spot.value)||''});
@@ -943,7 +934,7 @@ function drawServer(){
   const slot=$('#b_slot');
   if(slot) slot.textContent=(cur||'—') + ' — ' + (O.brief[cur]||'');
   const md=($('#b_mode')||{}).value;
-  if(md!=='server' && md!=='both'){ e.innerHTML=''; return blockNote(); }
+  if(md!=='server'){ e.innerHTML=''; return blockNote(); }
   const w=O.ways.find(x=>x.key===(O.conf.way||'usb'))||O.ways[0]||{steps:[]};
   const hp=hostPort(), over=hp.length-O.limit;
   e.innerHTML=`<div class="wgrid">` + O.ways.map(x=>
@@ -989,7 +980,7 @@ function blockNote(){
   const e=$('#b_block'); if(!e) return;
   const mode=($('#b_mode')||{}).value||'local';
   let msg='';
-  if(mode==='server' || mode==='both'){
+  if(mode==='server'){
     const w=O.ways.find(x=>x.key===(O.conf.way||'usb'))||{};
     if(!w.fixed && !((O.conf.host||'').trim())) msg=T('서버 주소를 적으세요.');
     else if(hostPort().length>O.limit) msg=T('주소가 자리보다 깁니다.');

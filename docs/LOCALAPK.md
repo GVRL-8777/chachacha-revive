@@ -103,18 +103,29 @@ get_initialVector:  return aes.Decrypt(_initialVector)
 python tools/mkskel.py
 ```
 
-## 한 벌에 둘 다 — 판은 파일 한 줄이 정한다
+## 판은 **구울 때** 정한다
 
-예전에는 APK 를 둘로 갈랐다. 서버판과 로컬판. 이제 **한 벌**을 굽고, 그
-안에서 갈린다.
+한동안은 한 벌에 둘 다 넣고 폰 안 `chamode.txt` 로 갈았다. 그러면 한 벌이
+두 얼굴이 되어, 지금 무엇으로 도는지 헷갈리고 서버판인데 서버가 없어
+먹통이 되는 일이 생긴다. 그래서 **로컬판과 서버판을 따로 굽고, 앱 안에서는
+못 바꾸게** 했다.
 
 ```
-chamode.txt   안이 "server" 면 서버판, 그 밖(없어도)이면 로컬판
+mkskel.py --mode local|server   →  ChaLocalData 에 `mode` 를 박는다
+ChaLocal.Mode                       그 값을 읽기만 한다 (쓰는 길이 없다)
 ```
 
-세이브 옆(`Android/data/<패키지>/files/`)에 둔다. 그래서 런처가 adb 로
-갈아 끼울 수 있고, **게임 안 겹판**의 `USE SERVER / USE LOCAL` 로도 바꾼다.
-바꾼 뒤에는 앱을 껐다 켜야 한다 — 켤 때 한 번만 읽는 자리가 있다.
+`chamode.txt` 도, 겹판의 `USE SERVER / USE LOCAL` 단추도, 런처의
+`/api/adb/mode` 도 없앴다.
+
+두 판 모두 `ChaLocal.dll` 을 싣는다 — 세이브 겹판이 거기 들어 있기
+때문이다. 갈고리들은 박아 둔 `mode` 를 보고 갈린다. 서버판에는 번들을 안
+넣는다(PC 에서 받는다).
+
+```
+로컬판   62.0 MB   pack.unity3d 있음   ChaLocal.dll 있음
+서버판   53.4 MB   pack.unity3d 없음   ChaLocal.dll 있음
+```
 
 ### 갈고리 다섯 중 셋은 ChaLocal 혼자 갈린다
 
@@ -144,11 +155,23 @@ __ChaSwitch.__ChaDec(Aes a, string s)
 ### 굽기
 
 ```
-chatool build --mode both
+chatool build --mode local     서버 없이 폰 안에서 돈다
+chatool build --mode server    PC 의 chacnserver.py 에 붙는다
 ```
 
-로컬판과 **같은 것을 굽는다**. 번들도 들어가고(7.0 MB), 서버 주소도
-자산에 박힌다. 나온 APK 는 57.4 MB.
+### 세이브 겹판이 알려 주는 것
+
+```
+NOW  G 23.346  T 9.984  CAR 4  DRV 8   -> SLOT 3
+...
+MODE  LOCAL    (runs on its own, no server)
+MODE  SERVER   127.0.0.1:8888   needs chacnserver.py + adb reverse
+```
+
+`-> SLOT 3` 은 **지금 세이브가 3번 칸에 그대로 담겨 있다**는 뜻이다. 슬롯
+파일과 글자를 통째로 견주므로, 저장한 뒤 게임을 더 하면 `(not saved)` 로
+돌아간다. 서버판에서는 판과 붙을 자리를 적어 준다 — 슬롯은 로컬판 몫이라는
+줄도 함께 뜬다(서버판은 상태를 PC 가 들고 있다).
 
 ## 복원 자산 번들
 

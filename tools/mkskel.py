@@ -28,7 +28,16 @@ OUT_JSON = os.path.join(ROOT, 'chalocal_data.json')
 OUT_CS = os.path.join(ROOT, 'patch', 'ChaLocalData.cs')
 
 
-def gather(preset=None, pkg='', save=None):
+def _host():
+    """서버판이 붙을 주소. 자산에 박혀 있는 것을 그대로 읽는다."""
+    try:
+        import chahost
+        return chahost.read() or ''
+    except Exception:
+        return ''
+
+
+def gather(preset=None, pkg='', save=None, mode='local'):
     paths = sorted(set(S.ROUTE_CLASS) | set(S.ROUTES))
     if save:
         start = json.load(io.open(save, encoding='utf-8'))
@@ -69,6 +78,12 @@ def gather(preset=None, pkg='', save=None):
         'maxGold': C.MAX_GOLD, 'maxTrophy': C.MAX_TROPHY,
         'maxTire': C.MAX_TIRE,
         'items': C.ITEMS,
+        # 이 APK 가 어느 판인지. **구울 때 못 박는다.** 예전에는 폰 안
+        # `chamode.txt` 로 갈았는데, 그러면 한 벌이 두 얼굴이 되어
+        # 헷갈린다. 이제 로컬판과 서버판을 따로 굽는다.
+        'mode': mode,
+        # 서버판이 붙을 자리. 세이브 겹판에 그대로 보여 준다.
+        'host': _host(),
         # 스킬 표(값·최대 레벨·올림값). 로컬판이 그대로 셈에 쓴다.
         'skillTab': __import__('chaskill').table(),
     }
@@ -104,18 +119,22 @@ def main():
     preset = None
     pkg = ''
     save = None
+    mode = 'local'
     for i, a in enumerate(_ARGV):
+        if a == '--mode' and i + 1 < len(_ARGV):
+            mode = _ARGV[i + 1]
         if a == '--preset' and i + 1 < len(_ARGV):
             preset = _ARGV[i + 1]
         if a == '--pkg' and i + 1 < len(_ARGV):
             pkg = _ARGV[i + 1]
         if a == '--save' and i + 1 < len(_ARGV):
             save = _ARGV[i + 1]
-    d, paths = gather(preset, pkg, save)
+    d, paths = gather(preset, pkg, save, mode)
     if save:
         print('구워 넣는 세이브: %s' % save)
     if preset:
         print('프리셋: %s' % preset)
+    print('판: %s%s' % (mode, ('  (%s)' % d['host']) if d.get('host') else ''))
     blob = json.dumps(d, ensure_ascii=False, sort_keys=True,
                       separators=(',', ':'))
     io.open(OUT_JSON, 'w', encoding='utf-8').write(blob)

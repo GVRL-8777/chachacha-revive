@@ -107,7 +107,7 @@ def ways(t=None):
 def check(mode, way, host, port, t=None):
     """굽기 전에 막을 까닭이 있으면 그 말을 돌려준다. 없으면 빈 문자열."""
     t = t or _plain
-    if mode not in ('server', 'both'):
+    if mode != 'server':
         return ''
     w = H.WAY_BY_KEY.get(way) or H.WAYS[0]
     if not w['fixed'] and not (host or '').strip():
@@ -159,8 +159,7 @@ def run(say, mode='local', slot=None, install=False, way='usb', host='',
     """한 벌을 굽는다. 실패하면 SystemExit 을 던진다."""
     t0 = time.time()
     slot = slot or T.active_name()
-    # 'both' 도 서버로 갈 수 있으니 주소를 맞춰 둔다.
-    if mode in ('server', 'both'):
+    if mode == 'server':
         hp = hostport(way, host, port)
         say('서버 주소를 맞춥니다: %s' % hp)
         _n, msg = H.write(hp, T.TREE)

@@ -5,11 +5,12 @@
 
 ---
 
-## 담긴 파일 13개
+## 담긴 파일 14개
 
 | 파일 | 하는 일 |
 |---|---|
 | [`CAPTURE.md`](CAPTURE.md) | 요청 스키마 수집기 (Schema Collector) |
+| [`CARS5.md`](CARS5.md) | 한국 정식판 5.1.0 에서 건져 온 것들 |
 | [`DORMANT.md`](DORMANT.md) | 묻어 둔 기능들 |
 | [`FILES.md`](FILES.md) | 이 문서. 파일 하나하나가 하는 일. |
 | [`GPU.md`](GPU.md) | 어떤 폰에서는 3D 가 안 나온다 (Mali · 안드로이드 16) |

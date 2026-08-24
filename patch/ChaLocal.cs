@@ -485,11 +485,13 @@ public static class ChaLocal
     // 예전에는 APK 를 둘로 갈랐다 — 서버판과 로컬판. 이제 **한 벌** 안에
     // 둘 다 들어 있고, 파일 한 줄이 어느 쪽으로 돌지 정한다.
     //
-    //   chamode.txt  안이 "server" 면 서버판, 그 밖(없어도)이면 로컬판.
+    // **구울 때 못 박는다.** `mkskel.py` 가 `ChaLocalData` 에 적어 넣고,
+    // 앱 안에서는 바꿀 수 없다.
     //
-    // 세이브 옆에 두므로 런처가 adb 로 갈아 끼울 수 있고, 게임 안 겹판에서도
-    // 바꾼다. 바꾼 뒤에는 앱을 껐다 켜야 한다 — 갈고리가 켤 때 한 번만
-    // 읽는 자리들이 있다.
+    // 예전에는 세이브 옆 `chamode.txt` 를 읽어 갈았다. 그러면 한 벌이 두
+    // 얼굴이 되어, 지금 무엇으로 도는지 헷갈리고 서버판인데 서버가 없어
+    // 먹통이 되는 일이 생긴다. 이제 런처가 **로컬판과 서버판을 따로**
+    // 굽는다.
     public const string LOCAL = "local";
     public const string SERVER = "server";
 
@@ -503,9 +505,8 @@ public static class ChaLocal
         return saveDir;
     }
 
-    public static string ModePath { get { return SaveDir() + "/chamode.txt"; } }
-
-    /// 지금 판. **Boot 보다 먼저** 불릴 수 있으므로 혼자 설 수 있어야 한다.
+    /// 지금 판. 구울 때 박은 값이다. **Boot 보다 먼저** 불릴 수 있으므로
+    /// 혼자 설 수 있어야 한다 — 그래서 데이터를 직접 연다.
     public static string Mode
     {
         get
@@ -515,12 +516,12 @@ public static class ChaLocal
                 mode = LOCAL;
                 try
                 {
-                    string p = ModePath;
-                    if (File.Exists(p))
-                    {
-                        string v = ReadText(p).Trim().ToLower();
-                        if (v == SERVER) mode = SERVER;
-                    }
+                    // **Boot 을 부르지 않는다.** Boot 은 겹판까지 만드는데,
+                    // 이 값은 갈고리들이 아주 이른 때 물어보므로 그때 겹판을
+                    // 만들려다 실패하면 영영 안 뜬다(Ensure 가 한 번만 돈다).
+                    string v = GetS(Data(), "mode");
+                    if (v != null && v.Trim().ToLower() == SERVER)
+                        mode = SERVER;
                 }
                 catch (Exception) { }
                 Debug.Log("[ChaLocal] 판: " + mode);
@@ -532,12 +533,23 @@ public static class ChaLocal
     /// 로컬판인가. **갈고리들이 이걸 보고 갈린다.**
     public static bool IsLocal() { return Mode == LOCAL; }
 
-    /// 판을 바꾼다. 다음에 켤 때부터 먹는다.
-    public static void SetMode(string m)
+    /// 구워 넣은 자료. 겹판을 만들지 않고 **표만** 연다.
+    static Hashtable Data()
     {
-        mode = (m == SERVER) ? SERVER : LOCAL;
-        try { WriteText(ModePath, mode); }
-        catch (Exception e) { Debug.LogError("[ChaLocal] 판 저장 실패 " + e); }
+        if (D != null) return D;
+        Hashtable d = Jp.Parse(ChaLocalData.Json()) as Hashtable;
+        return d ?? new Hashtable();
+    }
+
+    /// 서버판이 붙을 자리. 세이브 겹판이 보여 준다.
+    public static string Host()
+    {
+        try
+        {
+            string h = GetS(Data(), "host");
+            return h ?? "";
+        }
+        catch (Exception) { return ""; }
     }
 
     static string PickSaveDir()
@@ -2094,7 +2106,7 @@ public class ChaLocalUI : MonoBehaviour
     // 누른 자리는 **직접** 받습니다. `GUI.Button` 의 반환값은 이 빌드에서
     // 손가락 입력에 반응하지 않았습니다(그림은 나오는데 눌리지 않습니다).
     // 그래서 그리기와 누르기를 갈라, 자리 비교는 우리가 합니다.
-    Rect rTab, rClose, rMode;
+    Rect rTab, rClose;
     Rect[] rSave = new Rect[SLOTS + 1];
     Rect[] rLoad = new Rect[SLOTS + 1];
     Rect[] rDel = new Rect[SLOTS + 1];
@@ -2113,11 +2125,47 @@ public class ChaLocalUI : MonoBehaviour
         return Dir() + "/slot" + (n < 10 ? "0" : "") + n + ".json";
     }
 
+    /// 지금 세이브가 어느 슬롯에 들어 있는지. 없으면 안 담긴 것이다.
+    string savedAt = "";
+
     void Rescan()
     {
         info[0] = ChaLocal.SlotSummary(ChaLocal.SaveFile());
         for (int i = 1; i <= SLOTS; i++)
             info[i] = ChaLocal.SlotSummary(SlotPath(i));
+        savedAt = FindSlot();
+    }
+
+    /// 지금 세이브와 **같은 내용**인 슬롯을 찾는다.
+    ///
+    /// 글자를 통째로 견준다. 슬롯은 이 겹판이 그대로 베껴 넣은 것이라
+    /// 같으면 한 글자도 안 다르다. 저장한 뒤 게임을 더 하면 달라지므로,
+    /// "지금 이대로 담겨 있는가"를 그대로 나타낸다.
+    string FindSlot()
+    {
+        try
+        {
+            string now = ChaLocal.ReadText(ChaLocal.SaveFile());
+            if (now == null || now.Length == 0) return "(not saved)";
+            for (int i = 1; i <= SLOTS; i++)
+            {
+                if (!File.Exists(SlotPath(i))) continue;
+                if (ChaLocal.ReadText(SlotPath(i)) == now)
+                    return "-> SLOT " + i;
+            }
+        }
+        catch (Exception) { }
+        return "(not saved)";
+    }
+
+    /// 아래에 적을 판 한 줄. 서버판이면 어디에 붙는지까지 적는다.
+    string ModeLine()
+    {
+        if (ChaLocal.IsLocal())
+            return "MODE  LOCAL   (runs on its own, no server)";
+        string h = ChaLocal.Host();
+        return "MODE  SERVER   " + (h.Length > 0 ? h : "(no address)")
+               + "   needs chacnserver.py + adb reverse";
     }
 
     void Copy(string from, string to)
@@ -2134,7 +2182,6 @@ public class ChaLocalUI : MonoBehaviour
         float w = PW, h = PH;
         float x = (SW - w) / 2, y = (SH - h) / 2;
         rClose = new Rect(x + w - 58, y + 4, 50, 20);
-        rMode = new Rect(x + w - 160, y + h - 50, 150, 20);
         float row = y + 48;
         for (int i = 1; i <= SLOTS; i++)
         {
@@ -2207,15 +2254,6 @@ public class ChaLocalUI : MonoBehaviour
                 return;
             }
         }
-        if (rMode.Contains(p))
-        {
-            // 서버판 <-> 로컬판. 갈고리들이 켤 때 한 번만 읽는 자리가 있어
-            // 바로는 안 바뀐다 — 앱을 껐다 켜야 한다. LOAD 와 같은 사정이다.
-            ChaLocal.SetMode(ChaLocal.IsLocal() ? ChaLocal.SERVER
-                                                : ChaLocal.LOCAL);
-            note = "mode -> " + ChaLocal.Mode + " (restart)";
-            return;
-        }
     }
 
     void OnGUI()
@@ -2237,7 +2275,8 @@ public class ChaLocalUI : MonoBehaviour
         for (int k = 0; k < 7; k++) GUI.Box(box, "");
         GUI.Label(new Rect(x + 10, y + 6, w - 90, 18), "SAVE SLOTS");
         GUI.Box(rClose, "CLOSE");
-        GUI.Label(new Rect(x + 10, y + 26, w - 20, 18), "NOW  " + info[0]);
+        GUI.Label(new Rect(x + 10, y + 26, w - 20, 18),
+                  "NOW  " + info[0] + "   " + savedAt);
         float row = y + 48;
         for (int i = 1; i <= SLOTS; i++)
         {
@@ -2248,12 +2287,12 @@ public class ChaLocalUI : MonoBehaviour
             GUI.Box(rDel[i], has ? "DEL" : "-");
             row += 26;
         }
-        GUI.Label(new Rect(x + 10, y + h - 50, w - 170, 18),
-                  "MODE  " + ChaLocal.Mode.ToUpper());
-        GUI.Box(rMode, ChaLocal.IsLocal() ? "USE SERVER" : "USE LOCAL");
+        GUI.Label(new Rect(x + 10, y + h - 50, w - 20, 18), ModeLine());
         GUI.Label(new Rect(x + 10, y + h - 30, w - 20, 18), note);
         GUI.Label(new Rect(x + 10, y + h - 16, w - 20, 18),
-                  "LOAD and MODE close/need a restart to take effect.");
+                  ChaLocal.IsLocal()
+                  ? "LOAD closes the app; start it again to take effect."
+                  : "Slots are for the LOCAL build - the server keeps state on the PC.");
         GUI.matrix = keep;
     }
 }

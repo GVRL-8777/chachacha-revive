@@ -411,13 +411,14 @@ def _newer(a, b):
     return os.path.getmtime(a) > os.path.getmtime(b)
 
 
-def _bake_save(slot, say):
+def _bake_save(slot, say, mode='local'):
     """고른 세이브를 ChaLocalData.cs 에 굽는다. 그 APK 의 시작 상태가 된다.
 
     APK 는 한 벌이므로 여기가 유일한 '판' 이다. 다른 상태로 시작하고
     싶으면 세이브를 바꿔 굽거나, 폰에 세이브를 넣으면 된다."""
     env = dict(os.environ, PYTHONIOENCODING='utf-8')
-    cmd = [sys.executable, os.path.join(CODE, 'mkskel.py'), '--pkg', PKG]
+    cmd = [sys.executable, os.path.join(CODE, 'mkskel.py'), '--pkg', PKG,
+           '--mode', mode]
     if slot and slot in slots():
         cmd += ['--save', slot_path(slot)]
     r = _run(cmd, cwd=HERE, env=env)
@@ -479,14 +480,14 @@ def _stage(mode, say, slot=None):
     helper = os.path.join(mgd, 'ChaLocal.dll')
     bundle_src = os.path.join(HERE, 'bundles', 'pack.unity3d')
     bundle_dst = os.path.join(TREE, 'assets', 'pack.unity3d')
-    if mode in ('local', 'both'):
-        # 'both' 도 로컬판과 **같은 것을 굽는다.** ChaLocal 안의 갈고리들이
-        # `chamode.txt` 를 보고 갈리므로, 한 벌에 두 길이 다 들어 있다.
-        # 서버로 갈 때 쓸 주소는 자산에 이미 박혀 있다(chahost).
-        _bake_save(slot, say)
-        dll, acl = _make_local_dll(say, force=True)
-        shutil.copyfile(acl, tgt)
-        shutil.copyfile(dll, helper)
+    # 두 판 모두 `ChaLocal.dll` 을 싣는다. 세이브 겹판이 거기 들어 있고,
+    # 갈고리들은 **구울 때 박은 판**(`ChaLocalData` 의 `mode`)을 보고 갈린다.
+    # 앱 안에서는 판을 바꿀 수 없다 — 로컬판과 서버판을 따로 굽는다.
+    _bake_save(slot, say, mode)
+    dll, acl = _make_local_dll(say, force=True)
+    shutil.copyfile(acl, tgt)
+    shutil.copyfile(dll, helper)
+    if mode == 'local':
         # 복원 자산 번들은 PC 에서 받는 대신 APK 안에 넣는다
         if os.path.exists(bundle_src):
             if _newer(bundle_src, bundle_dst):
@@ -494,16 +495,14 @@ def _stage(mode, say, slot=None):
             say('번들 동봉: %.1f MB' % (os.path.getsize(bundle_dst) / 1048576.0))
         else:
             say('[주의] bundles/pack.unity3d 가 없습니다. 복원한 맵이 빠집니다.')
-        say(_msg('로컬 전용으로 맞췄습니다 (서버 없이 돕니다)') if mode == 'local'
-            else _msg('한 벌에 둘 다 넣었습니다. 게임 안에서 판을 바꿉니다.'))
+        say(_msg('로컬 전용으로 맞췄습니다 (서버 없이 돕니다)'))
     else:
-        acc = os.path.join(HERE, 'ACCN.dll')
-        if os.path.exists(acc):
-            shutil.copyfile(acc, tgt)
-        for p in (helper, bundle_dst):
-            if os.path.exists(p):
-                os.remove(p)
+        # 서버판은 번들도 PC 에서 받는다. APK 에 든 것이 있으면 걷어낸다.
+        if os.path.exists(bundle_dst):
+            os.remove(bundle_dst)
+        import chahost
         say('서버용으로 맞췄습니다 (PC 의 chacnserver.py 가 있어야 합니다)')
+        say('붙을 자리: %s' % (chahost.read() or '(주소가 없습니다)'))
 
 
 def cmd_newcar(args):
@@ -550,8 +549,8 @@ def build_apk(mode, slot=None, out=None, install=False, say=print):
         r = _run(adb_cmd('install', '-r', '--bypass-low-target-sdk-block',
                          out), cwd=HERE)
         say('설치: %s' % ((r.stdout or '').strip().splitlines() or ['?'])[-1])
-    if mode in ('local', 'both'):
-        say('앱 이름 %s · 패키지 %s' % (APP_LABEL, PKG))
+    say('앱 이름 %s · 패키지 %s' % (APP_LABEL, PKG))
+    if mode == 'local':
         say('구워 넣은 세이브: %s' % (slot or '(기본)'))
         say('세이브는 폰 안 %s 에 있습니다.' % DEVICE_SAVE)
         say("런처의 '기기에 넣기'로 올리고 '기기에서 가져오기'로 되받으면 됩니다.")
@@ -958,27 +957,6 @@ def _api(path, body):
                 'msg': _msg('이 기기를 씁니다: %s') % who if who
                        else _msg('기기를 자동으로 고릅니다')}
 
-    if path == '/api/adb/mode':
-        # 폰의 판을 바꾼다. 앱 안 겹판에서도 바꿀 수 있지만, 여기서 하면
-        # 굽지 않고도 갈아 끼울 수 있다. 앱은 껐다 켜야 먹는다.
-        want = 'server' if (body.get('mode') == 'server') else 'local'
-        tmp = os.path.join(SAVES, '.chamode.txt')
-        io.open(tmp, 'w', encoding='utf-8').write(want)
-        remote = ('/storage/emulated/0/Android/data/%s/files/chamode.txt' % PKG)
-        _run(adb_cmd('shell', 'mkdir', '-p', os.path.dirname(remote)))
-        r = _run(adb_cmd('push', tmp, remote))
-        ok = r.returncode == 0
-        try:
-            os.remove(tmp)
-        except OSError:
-            pass
-        if ok:
-            chalog.add('device', _msg('폰의 판을 %s 로 바꿨습니다') % want)
-        return {'ok': ok, 'mode': want,
-                'msg': _msg('폰의 판을 %s 로 바꿨습니다. 앱을 껐다 켜세요.')
-                       % want if ok
-                       else ((r.stderr or r.stdout or '').strip())}
-
     if path == '/api/adb/apps':
         return {'ok': True, 'apps': adb_apps(), 'known': [
             {'pkg': p, 'label': l} for p, l in KNOWN_APPS]}
@@ -1282,7 +1260,7 @@ def main():
     p.set_defaults(func=cmd_newcar)
 
     p = sub.add_parser('build')
-    p.add_argument('--mode', choices=['server', 'local'], default='server')
+    p.add_argument('--mode', choices=['local', 'server'], default='local')
     p.add_argument('--slot', help='APK 에 구워 넣을 세이브 이름')
     p.add_argument('--out', help='APK 파일 이름')
     p.add_argument('--install', action='store_true')
