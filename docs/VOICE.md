@@ -84,21 +84,64 @@ python tools/voxout.py --one    드라이버마다 대표 한 마디만
 네 개는 `m_Type=20` 에 **WAV**(`RIFF`)가 들어 있습니다. 적힌 값을 믿고
 `.ogg` 를 붙이면 안 열리는 파일이 나옵니다. 첫 바이트로 정해야 합니다.
 
-## 아직 모르는 것
+## 넷은 드라이버가 아니라 **차**다
 
-번들의 보이스 폴더 이름은 게임 코드의 `Cutin/eCutinModelType` 순서입니다.
+`Player::_GetCutinModel()` 의 IL 이 그대로 말해 준다.
 
 ```
-0 DOKANG  1 SARA  2 BIN  3 NAYOUBI  4 PIG  5 GYARU
-6 POLY    7 AMBER 8 ROI  9 HELLY   10 ANGRY  11 ROPE
+carName == "Poli"  → 6 POLY      carName == "Amber" → 7 AMBER
+carName == "Roy"   → 8 ROI       carName == "helly" → 9 HELLY
+그 밖에는 driverType(Driver_1~8) → 0,1,2,3,4,5,10,11
 ```
 
-**1~4번은 원작 기본 드라이버라** 텍스트표의 `Char1~Char4`
-(도 강현 · Sarah Cha · 빈 경유 · 나 연비)와 확실히 맞습니다.
+**차 이름이 드라이버를 덮어쓴다.** 그 넷을 타면 드라이버가 누구든 무시되고
+차 자신의 얼굴(컷인)과 목소리가 나온다. 로보카 폴리 네 대다.
 
-5번부터는 이 프로젝트가 복원 번들에서 끌어온 자리라, 목소리와 게임 안
-이름(`Char5~Char12`)의 짝을 **아직 확정하지 못했습니다.** 귀로 들어야
-가려지는 부분입니다.
+그래서 보이스 폴더의 짝은 이렇게 확정된다.
+
+| 폴더 | `eCutinModelType` | 게임 안 |
+|---|---|---|
+| `DOKANG` | 0 | Char1 도 강현 |
+| `SARA` | 1 | Char2 Sarah Cha |
+| `BIN` | 2 | Char3 빈 경유 |
+| `NAYOUBI` | 3 | Char4 나 연비 |
+| `PIG` | 4 | Char5 김준현 |
+| `GYARU` | 5 | Char6 갸루상 |
+| `POLY` | 6 | **차** Poli |
+| `AMBER` | 7 | **차** Amber |
+| `ROI` | 8 | **차** Roy |
+| `HELLY` | 9 | **차** helly |
+| `ANGRY` | 10 | Char7 앵그리성호 |
+| (없음) | 11 ROPE | Char8 정신이 — **보이스가 없다** |
+
+`Char8 정신이`의 보이스는 우리가 가진 어느 판에도 없다.
+
+## 폴리 · 앰버 · 로이는 **모델이 없다**
+
+넷 중 차 모델이 남아 있는 것은 **helly 뿐**이다. 가진 배포판을 전수로
+훑었다 — 오브젝트 이름으로도, `mainData` 의 자원 색인으로도 없다.
+
+| 배포판 | helly | Poli · Amber · Roy |
+|---|---|---|
+| 고고고 레이서 1.4.2 | 차 45항목 | 없음 |
+| 한국 7.7.0 | 차 45항목 | 없음 |
+| 중국판 7.7 | 없음(우리가 번들로 넣었다) | 없음 |
+| 한국 초기판 8.apk | 없음 | 없음 |
+
+남아 있는 것은 **껍데기뿐**이다.
+
+- 자동차 샵 아이콘 — `Atlas_SpecialCarIcon` 에 `Poli_A/R/S` · `Amber_A/R/S`
+  · `Roy_A/R/S` 가 그대로 있다
+- 보이스 스무 마디씩 (카카오판에서 복원한 번들 안에)
+- 위 `_GetCutinModel` 의 코드 갈래
+
+즉 **차를 부를 준비는 다 되어 있는데 차만 없다.** 이 게임은 차를 CDN
+(`AssetBundleManager`)에서 받아 왔고 그 CDN 은 2014년에 죽었다. helly 만
+살아남은 것은 그 차가 APK 안에 통째로 들어 있는 판(고고고 레이서 ·
+한국 7.7.0)이 우리 손에 있었기 때문이다.
+
+되살리려면 **모델을 새로 만드는 수밖에 없다.** 아이콘이 남아 있으니 생김새는
+알 수 있고, 트로이를 넣은 길(`docs/TROY.md`)을 그대로 쓰면 된다.
 
 ## 되돌리기
 

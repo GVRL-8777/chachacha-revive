@@ -41,10 +41,20 @@ OUT = os.path.join(HERE, 'export', 'voice')
 # `Cutin/eCutinModelType` 열거형 순서 그대로. 게임 텍스트표의 `Char1..12` 와
 # 짝지었다. 1~4 는 원작 기본 드라이버라 확실하고, 5~11 은 이 프로젝트가
 # 복원 번들에서 끌어온 것이라 **짝이 확실하지 않다**(설명은 아래 README).
+# `Player::_GetCutinModel()` 의 IL 을 읽어 확정했다(2026-08-24).
+#
+#   차 이름이 먼저다 — Poli→6 · Amber→7 · Roy→8 · helly→9.
+#   **그 넷은 차가 곧 캐릭터다.** 그 차를 타면 드라이버 대신 차의 얼굴과
+#   목소리가 나온다.
+#   그 밖에는 driverType(Driver_1~8) 으로 0,1,2,3,4,5,10,11 에 붙는다.
 MODEL = [
-    ('DOKANG', '도 강현'), ('SARA', 'Sarah Cha'), ('BIN', '빈 경유'),
-    ('NAYOUBI', '나 연비'), ('PIG', None), ('GYARU', None), ('POLY', None),
-    ('AMBER', None), ('ROI', None), ('HELLY', None), ('ANGRY', None),
+    ('DOKANG', '도 강현 (Char1)'), ('SARA', 'Sarah Cha (Char2)'),
+    ('BIN', '빈 경유 (Char3)'), ('NAYOUBI', '나 연비 (Char4)'),
+    ('PIG', '김준현 (Char5)'), ('GYARU', '갸루상 (Char6)'),
+    ('POLY', '**차** Poli'), ('AMBER', '**차** Amber'),
+    ('ROI', '**차** Roy'), ('HELLY', '**차** helly'),
+    ('ANGRY', '앵그리성호 (Char7)'),
+    # 11 ROPE = 정신이(Char8). 우리가 가진 어느 판에도 보이스가 없다.
 ]
 # 어느 판에서 온 소리인가. **둘 다 한국어다** — 귀로 확인했다(2026-08-24).
 # 예전에 카카오판을 '동남아/영문판'으로 적어 두었는데 틀렸다. 차 이름이
@@ -184,14 +194,23 @@ def readme(out_dir, lines, only_one):
     for f, w, m, a, b in lines:
         t.append('| `%s` | %s | %s | %d / %d |' % (f, w, m, a, b))
     t.append('')
-    t.append('## 이름이 미상인 까닭')
+    t.append('## 넷은 드라이버가 아니라 **차**입니다')
     t.append('')
-    t.append('폴더 이름의 `DOKANG` 같은 말은 게임 코드의 `eCutinModelType`')
-    t.append('열거형 순서 그대로입니다. **1~4번은 원작 기본 드라이버라 게임')
-    t.append('텍스트표의 `Char1~Char4` 와 확실히 짝이 맞습니다.**')
-    t.append('5번부터는 이 프로젝트가 복원 번들에서 끌어온 자리라, 목소리와')
-    t.append('게임 안 이름(`Char5~Char12`)의 짝을 아직 확정하지 못했습니다.')
-    t.append('들어 보시고 "이건 누구 목소리다" 싶으면 알려 주세요.')
+    t.append('`Poli` · `Amber` · `Roy` · `helly` 는 드라이버가 아니라 차 이름입니다.')
+    t.append('`Player::_GetCutinModel()` 이 **차 이름을 먼저** 보고, 그 넷이면')
+    t.append('드라이버를 무시하고 차 자신의 얼굴과 목소리를 씁니다.')
+    t.append('')
+    t.append('```')
+    t.append('carName == "Poli"  → 6   carName == "Amber" → 7')
+    t.append('carName == "Roy"   → 8   carName == "helly" → 9')
+    t.append('그 밖에는 driverType(Driver_1~8) → 0,1,2,3,4,5,10,11')
+    t.append('```')
+    t.append('')
+    t.append('그래서 이 넷의 보이스는 **그 차를 탈 때만** 들립니다.')
+    t.append('지금 빌드에 모델이 있는 것은 `helly` 뿐입니다.')
+    t.append('')
+    t.append('빠진 것 하나: `Char8 정신이`(모델 11 `ROPE`)는 우리가 가진 어느')
+    t.append('판에도 보이스가 없습니다.')
     t.append('')
     t.append('## 파일 이름')
     t.append('')
