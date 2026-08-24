@@ -46,6 +46,26 @@
 (`TradeCarValueDB.GetDiscountTrophy`). 1부터 세는 규칙이 여기도 적용된다.
 가격 자체(`originPrice`=120)는 프리팹에 구워져 있다.
 
+## 어디까지 왔나 — 경로로 센 것 (2026-08-25 실측)
+
+클라이언트 DLL 이 실제로 부르는 서버 경로를 전부 뽑아 우리 표와 맞춰 봤다.
+
+```
+DLL 이 부르는 경로   77개
+  손수 답한다        39개   알맹이까지 만든다
+  빈 스키마          10개   모양만 맞춰 돌려준다 (부작용 없는 것들)
+  아예 없다          28개   아래에 갈래별로 적는다
+```
+
+세는 법은 이렇다.
+
+```python
+import chacnserver as S            # ROUTES=손수 답함, ROUTE_CLASS=스키마 있음
+# cdump strings '^/[a-z]' 로 DLL 안 경로 리터럴을 뽑아 세 갈래로 가른다
+```
+
+---
+
 ## 묻어 둔 것
 
 전부 **자산과 화면은 살아 있고 서버만 없다.** 켜는 법도 안다.
@@ -79,26 +99,22 @@
 - 살리려면 `trimcars.py` 처럼 CarDataBase 에서 몇 대의 `EventCar` 를 켠다
 - 이벤트 세일은 `/shop/package/buy` 와 할인가 정의가 필요하다
 
-### 아이템 7종
-- **회수가 가장 크다.** 상점에 일곱 칸이 이미 다 보이고 전부 0개다
-- 서버: `/shop/item/list`(items[itemCode · itemCount] · toolboxRetryCount ·
-  toolboxRebuyGoldAmt) · `/shop/item/buy` · `/shop/item/rebuy` ·
-  `/play/item/use` · `/play/item/buyuse`
+### 아이템 7종 — **살렸다** (남은 것은 되사기뿐)
+- `/shop/item/list` · `/shop/item/buy` · `/play/item/use` 는 답한다
 - 코드 순서: `BestOil · Nos · FrontSensor · ToolBox · OneShot · Emergency · Turbo`
 - 강화공구상자는 그 자체가 뽑기다 — `TB_BestOil · TB_Nos · TB_Magnet ·
   TB_DoubleGold · TB_Emergency` 중 하나
-- **수량은 이미 `chastate.json` 의 `items` 에 들어 있다.** 서버만 붙이면 된다
+- 남은 것: `/shop/item/rebuy`(공구상자 되사기) · `/shop/item/buy/season2` ·
+  `/play/item/buyuse`(모자랄 때 그 자리에서 사서 쓰기)
 
-### 차량 스킬
-- 서버: `/skill/get/list`(skillList[skillNo · carNo · skillLevel · equipFlag ·
-  skillType]) · `/skill/buy` · `/skill/equip` · `/skill/upgrade`
-- 스킬 정의는 `database/skilldatabase` 에 11.8KB 통째로 있다
-- **보유 상태는 이미 `chastate.json` 의 `skills` 에 자리를 잡아 뒀다**
+### 차량 스킬 — **살렸다**
+- `/skill/get/list` · `/buy` · `/equip` · `/upgrade` 넷 다 답한다
+- 스킬 정의는 `database/skilldatabase` 에 11.8KB 통째로 있다 —
+  **정의가 자산에 남아 있는 몇 안 되는 기능이다**
 
-### 드라이버 구매 · 뽑기
-- `/shop/character/buy` · `/shop/character/random/buy` · `/user/character/random/select`
-- 지금은 `chastate.json` 의 `driversOwned` 가 12명 전원이라 상점 흐름이 죽어 있다.
-  몇 명을 빼면 살아난다(자동차 샵과 같은 방식)
+### 드라이버 — 낱개 구매는 **살렸고**, 뽑기가 남았다
+- `/shop/character/buy` 는 답한다(트로피로만 받고, 모자라면 `SVC_3003`)
+- 남은 것: `/shop/character/random/buy` · `/user/character/random/select`
 
 ### 타이어 선물 보내기 · 휴면 복귀
 - `/tire/present/send` · `/setting/present/allow` · `/tire/present/dormancyReward`
@@ -158,7 +174,38 @@ BossAppearCutin    BossResultCutin     BossUnlockNoticePop
 글자 · 위험등, 그리고 `car/bossenemymanager` 프리팹. 문자열도 보스 모드 ·
 보스퇴치점수 · 보스순위 · 히든 보스 포인트가 있다.
 
-**다만 보스 정의 표(`BossDataBase` 알맹이)는 서버가 내려주던 것이라 없다.**
+#### '보스 정의 표'가 무엇인가
+
+보스 한 마리가 **어떻게 생겨먹었는지 적어 둔 자료 묶음**이다. 코드는
+껍데기고, 실제 수치와 행동은 전부 이 표에서 읽는다(`BossData` 필드 실측).
+
+```
+index · name              몇 번째 보스인가 · 이름
+appearType                SideInJump | DownExplosion      등장하는 꼴
+attackType                MakeClone  | FireBall           평타
+skillType                 Laser | FireWall | Bombing      필살기
+isMoveBoss · isAttackMotion · shieldCooltime
+unlockRewardCar           잡으면 열리는 차 번호
+HP[] · attackCooltime[] · attackDamage[]
+skillCooltime[] · skillDamage[]                           단계별 배열
+```
+
+여기에 `WeaponDB`(무기 이름 · 번호 · 피해)와 `CloneDB`(분신 최대 수 ·
+단계별 속도 범위 · 배치)가 딸린다. `BossDataBase` 쪽에는 시작 스테이지 ·
+다음 스테이지 · 해금 보너스 범위 · 화염벽 속도 · 레이저 지속시간 같은
+판 전체 설정이 있다.
+
+즉 **"김치전 보스는 체력 얼마, 옆에서 뛰어들고, 분신을 만들고, 레이저를
+쓰고, 잡으면 무슨 차가 열린다"** 를 적어 둔 표다. 이게 없으면 클래스를
+다 옮겨도 보스가 하나도 안 나온다.
+
+`BossDataBase::LoadDataBase` 는 이 표를 **`AssetBundleManager`** 로 연다 —
+APK 가 아니라 **내려받는 번들**에 있었다. 우리가 가진 7.7.0 APK 의
+`database/bossdatabase` 는 빈 껍데기(GameObject + 60바이트 MonoBehaviour)다.
+서버는 그 위에 `hiddenBossPoint` 와 보스별 `unlockPoint` 만 얹어 줬다
+(`SetServerInfo`).
+
+**그래서 정의 표는 없다.**
 옮겨 오려면 클래스 열 남짓을 우리 DLL 로 이식하고, 그 표를 사설 서버가
 지어내야 한다. 7.7.0 의 `Assembly-CSharp` 은 1.45 MB 로 우리 것(1.10 MB)과
 사이가 멀어 작은 패치로 될 일이 아니다.
