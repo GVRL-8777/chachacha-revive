@@ -324,6 +324,11 @@ public static class ChaLocal
     static readonly int[] ITEM_COST = { 900, 800, 700, 600, 1000, 1500, 300 };
     const int ITEM_MAX = 99;
 
+    // 강화공구상자(4)는 사는 순간 안쪽 상품(8~12) 하나를 뽑아 주는 뽑기
+    // 상자다. chacnserver.py 의 TOOLBOX_PRIZES 와 같다.
+    static readonly int[] TOOLBOX_PRIZES = { 8, 9, 10, 11, 12 };
+    const long TOOLBOX_REBUY_COST = 300;   // Generic_ShopMain::ReBuyToolBoxOk
+
     // 캐릭터 값은 DB 에 없고 **캐릭터 화면 카드에 박혀 있습니다.**
     // 화면 값과 실제로 깎는 값이 어긋나면 안 되므로 그대로 옮겼습니다.
     //   1 도 강현 = 기본(무료) · 2 Sarah Cha 60 · 3 빈 경유 40 · 4 나 연비 50
@@ -1029,6 +1034,7 @@ public static class ChaLocal
         else if (path == "/skill/upgrade") return EpSkillUpgrade(q);
         else if (path == "/shop/item/list") return EpItemList(q);
         else if (path == "/shop/item/buy") return EpBuyItem(q);
+        else if (path == "/shop/item/rebuy") return EpReBuyToolBox(q);
         else if (path == "/play/item/use") return EpUseItem(q);
         else if (path == "/shop/character/buy") return EpBuyCharacter(q);
         else if (path == "/user/character/select") return EpSelectChar(q);
@@ -1431,14 +1437,21 @@ public static class ChaLocal
         }
         b["items"] = a;
         b["toolboxRetryCount"] = 0L;
-        b["toolboxRebuyGoldAmt"] = 0L;
+        b["toolboxRebuyGoldAmt"] = TOOLBOX_REBUY_COST;
         return b;
     }
 
     /// 아이템 한 개 구매. 값은 클라이언트 표와 같습니다.
+    ///
+    /// `toolboxItemNo` 가 **-1 이 아니면** 클라이언트는 공구상자 뽑기로
+    /// 알아듣고(Generic_ShopMain::BuyItemCompleteSever) 산 아이템 수를
+    /// 안 올린 채 엉뚱한 번호로 재구매 팝업을 띄웁니다. 평범한 구매는
+    /// -1 을, 강화공구상자(4)만 뽑은 상품 번호를 돌려야 합니다.
     static Hashtable EpBuyItem(Hashtable q)
     {
         int code = Pick(q, "itemCode");
+        Hashtable b = Auto("/shop/item/buy");
+        long toolboxItemNo = -1;
         for (int k = 0; k < ITEM_CODES.Length; k++)
         {
             if (ITEM_CODES[k] != code) continue;
@@ -1446,14 +1459,51 @@ public static class ChaLocal
             if (gold >= cost)
             {
                 gold -= cost;
-                int have = ItemAt(code) + 1;
-                items[code] = (long)(have > ITEM_MAX ? ITEM_MAX : have);
+                if (code == 4)
+                {
+                    int prize = TOOLBOX_PRIZES[NextInt(0, TOOLBOX_PRIZES.Length)];
+                    int have = ItemAt(prize) + 1;
+                    items[prize] = (long)(have > ITEM_MAX ? ITEM_MAX : have);
+                    toolboxItemNo = prize;
+                }
+                else
+                {
+                    int have = ItemAt(code) + 1;
+                    items[code] = (long)(have > ITEM_MAX ? ITEM_MAX : have);
+                }
             }
             break;
         }
-        Hashtable b = Auto("/shop/item/buy");
         b["remainGoldAmt"] = gold;
-        b["toolboxItemNo"] = 0L;
+        b["toolboxItemNo"] = toolboxItemNo;
+        return b;
+    }
+
+    /// 공구상자를 다시 뽑습니다(300골드) — 직전 상품은 사라집니다.
+    /// `Generic_ShopMain::ReBuyToolBoxOk` 가 직전 상품 번호를 itemCode 로
+    /// 실어 보냅니다. `SetToolBoxItem` 이 그 번호의 개수를 0으로 되돌리므로
+    /// 여기서도 맞춰 지웁니다.
+    static Hashtable EpReBuyToolBox(Hashtable q)
+    {
+        int prev = Pick(q, "itemCode");
+        Hashtable b = Auto("/shop/item/rebuy");
+        if (gold < TOOLBOX_REBUY_COST)
+        {
+            b["success"] = false;
+            b["errorCode"] = "SVC_5002";
+            b["toolboxItemNo"] = -1L;
+            b["remainGoldAmt"] = gold;
+            return b;
+        }
+        gold -= TOOLBOX_REBUY_COST;
+        int prize;
+        do { prize = TOOLBOX_PRIZES[NextInt(0, TOOLBOX_PRIZES.Length)]; }
+        while (prize == prev && TOOLBOX_PRIZES.Length > 1);
+        if (ItemAt(prev) != 0) items[prev] = 0L;
+        int have2 = ItemAt(prize) + 1;
+        items[prize] = (long)(have2 > ITEM_MAX ? ITEM_MAX : have2);
+        b["toolboxItemNo"] = (long)prize;
+        b["remainGoldAmt"] = gold;
         return b;
     }
 

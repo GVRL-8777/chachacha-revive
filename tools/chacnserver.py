@@ -54,6 +54,7 @@ ROUTE_CLASS = {
     "/user/boast/set": "HTTP_BoastAble",
     "/shop/item/list": "HTTP_GetItemList",
     "/shop/item/buy": "HTTP_BuyItem",
+    "/shop/item/rebuy": "HTTP_ReBuyToolBox",
     "/shop/car/buy": "HTTP_BuyCar",
     "/shop/car/unlock": "HTTP_UnlockClass",
     "/shop/car/unlockbuy": "HTTP_UnlockBuy",
@@ -1091,11 +1092,17 @@ def ep_updateuserinfo(req):
 # CRSystem/eItemCode 그대로. 8~12 는 공구상자 안쪽 코드라 상점에 안 나온다.
 ITEM_CODES = [1, 2, 3, 4, 5, 6, 7]
 ITEM_NAME = {1: "BestOil", 2: "Nos", 3: "FrontSensor", 4: "ToolBox",
-             5: "OneShot", 6: "Emergency", 7: "Turbo"}
+             5: "OneShot", 6: "Emergency", 7: "Turbo",
+             8: "TB_BestOil", 9: "TB_Nos", 10: "TB_Magnet",
+             11: "TB_DoubleGold", 12: "TB_Emergency"}
 # 값은 클라이언트 Generic_ShopMain/eItemCost 와 같은 값이어야 한다(골드).
 ITEM_COST = {1: 900, 2: 800, 3: 700, 4: 600, 5: 1000, 6: 1500, 7: 300}
 ITEM_MAX = 99
 ITEMS = {}
+
+# 강화공구상자(4)는 사는 순간 안쪽 상품(8~12) 하나를 뽑아 주는 뽑기 상자다.
+TOOLBOX_PRIZES = [8, 9, 10, 11, 12]
+TOOLBOX_REBUY_COST = 300     # Generic_ShopMain::ReBuyToolBoxOk 가 실기로 박아 둔 값
 
 
 def ep_itemlist(req):
@@ -1103,22 +1110,66 @@ def ep_itemlist(req):
     b["items"] = [{"itemCode": c, "itemCount": int(ITEMS.get(c, 0))}
                   for c in ITEM_CODES]
     b["toolboxRetryCount"] = 0
-    b["toolboxRebuyGoldAmt"] = 0
+    b["toolboxRebuyGoldAmt"] = TOOLBOX_REBUY_COST
     return b
 
 
 def ep_buyitem(req):
-    """아이템 한 개 구매. 값은 클라이언트 표와 같다."""
+    """아이템 한 개 구매. 값은 클라이언트 표와 같다.
+
+    `toolboxItemNo` 가 **-1 이 아니면** 클라이언트는 이것을 공구상자
+    뽑기로 알아듣고(`Generic_ShopMain::BuyItemCompleteSever`) 산 아이템
+    수를 안 올린 채 `SetToolBoxItem` 으로 새 팝업을 띄운다. 예전엔 여기서
+    늘 0을 돌려줬는데, 0은 -1이 아니라서 **모든 구매가** 그 길로 빠졌다
+    — 그래서 산 아이템은 안 늘고 "0을(를) 획득했습니다"만 떴다. 평범한
+    구매는 -1을 돌려야 한다. 공구상자(4)만 진짜로 -1이 아닌 값(뽑은
+    상품 번호)을 돌린다."""
     code = _pick(req, "itemCode")
     cost = ITEM_COST.get(code, 0)
-    if code in ITEM_COST and PLAYER["gold"] >= cost:
-        PLAYER["gold"] -= cost
+    b = auto("/shop/item/buy")
+    if code not in ITEM_COST or PLAYER["gold"] < cost:
+        b["toolboxItemNo"] = -1
+        b["remainGoldAmt"] = PLAYER["gold"]
+        return b
+    PLAYER["gold"] -= cost
+    if code == 4:
+        prize = random.choice(TOOLBOX_PRIZES)
+        ITEMS[prize] = min(ITEM_MAX, int(ITEMS.get(prize, 0)) + 1)
+        b["toolboxItemNo"] = prize
+        log("         *** 공구상자: %s (골드 -%d)" % (ITEM_NAME[prize], cost))
+    else:
         ITEMS[code] = min(ITEM_MAX, int(ITEMS.get(code, 0)) + 1)
+        b["toolboxItemNo"] = -1
         log("         *** 아이템 구매: %s (골드 -%d, 보유 %d)"
             % (ITEM_NAME[code], cost, ITEMS[code]))
-    b = auto("/shop/item/buy")
     b["remainGoldAmt"] = PLAYER["gold"]
-    b["toolboxItemNo"] = 0
+    return b
+
+
+def ep_rebuytoolbox(req):
+    """공구상자를 다시 뽑는다(300골드) — 직전 상품은 사라진다.
+
+    `Generic_ShopMain::ReBuyToolBoxOk` 가 이전에 뽑힌 상품 번호를
+    `itemCode` 로 실어 보낸다. `SetToolBoxItem` 이 그 번호의 개수를
+    0으로 되돌리므로 서버도 맞춰 지운다."""
+    prev = _pick(req, "itemCode")
+    b = auto("/shop/item/rebuy")
+    if PLAYER["gold"] < TOOLBOX_REBUY_COST:
+        b["success"] = False
+        b["errorCode"] = ERR_GOLD
+        b["toolboxItemNo"] = -1
+        b["remainGoldAmt"] = PLAYER["gold"]
+        return b
+    PLAYER["gold"] -= TOOLBOX_REBUY_COST
+    pool = [c for c in TOOLBOX_PRIZES if c != prev] or TOOLBOX_PRIZES
+    prize = random.choice(pool)
+    if prev in ITEMS:
+        ITEMS[prev] = 0
+    ITEMS[prize] = min(ITEM_MAX, int(ITEMS.get(prize, 0)) + 1)
+    log("         *** 공구상자 다시뽑기: %s -> %s (골드 -%d)"
+        % (ITEM_NAME.get(prev, prev), ITEM_NAME[prize], TOOLBOX_REBUY_COST))
+    b["toolboxItemNo"] = prize
+    b["remainGoldAmt"] = PLAYER["gold"]
     return b
 
 
@@ -1297,6 +1348,7 @@ ROUTES = {
     "/service/notice/get": ep_notice,
     "/shop/item/list": ep_itemlist,
     "/shop/item/buy": ep_buyitem,
+    "/shop/item/rebuy": ep_rebuytoolbox,
     "/play/item/use": ep_useitem,
     "/shop/character/buy": ep_buycharacter,
     "/user/info/update": ep_updateuserinfo,
