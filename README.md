@@ -24,7 +24,7 @@
 
 **그 외 지금은 서비스가 종료된 여러 온라인 게임들도 찾고 있습니다.**
 현재 서비스 종료된 한국 스마트폰 게임들 중
-**"다함께 차차차 2"(com.netmarble.chachacha2), "드리프트 걸즈"(com.nhnent.driftgirls.NE)**의 자료도 찾고 있습니다.
+**"다함께 차차차 2"(com.netmarble.chachacha2)**, **"드리프트 걸즈"(com.nhnent.driftgirls.NE)**의 자료도 찾고 있습니다.
 오래된 핸드폰의 data 폴더 내 위 제목의 폴더가 남아 있다면 보내주세요!
 
 ---
