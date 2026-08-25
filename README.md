@@ -24,8 +24,8 @@
 
 **그 외 지금은 서비스가 종료된 여러 온라인 게임들도 찾고 있습니다.**
 특히 오래된 핸드폰의 android/data 혹은 andriod/obb 폴더 안에 아래 제목의 폴더가 남아 있다면 보내주세요!
-**- "다함께 차차차 2"(com.netmarble.chachacha2)**, 
-**- "드리프트 걸즈"(com.nhnent.driftgirls.NE)**
+- **"다함께 차차차 2"(com.netmarble.chachacha2)**
+- **"드리프트 걸즈"(com.nhnent.driftgirls.NE)**
 
 ---
 
